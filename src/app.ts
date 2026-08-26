@@ -68,6 +68,11 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'success', code: 200, message: 'CadorDigital API is running', timestamp: new Date().toISOString() });
 });
 
+// Root route
+app.get('/', (_req, res) => {
+  res.json({ status: 'success', code: 200, message: 'CadorDigital API is running', timestamp: new Date().toISOString() });
+});
+
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/dashboard', adminDashboardRoutes);
 app.use('/api/admin/services', adminServiceRoutes);
