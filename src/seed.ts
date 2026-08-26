@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { PrismaClient } from '@prisma/client';
 import { hashPassword } from './utils/auth';
 
@@ -6,17 +8,24 @@ const prisma = new PrismaClient();
 async function seed() {
   console.log('Seeding database...');
 
-  const passwordHash = await hashPassword('SecurePassword123!');
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error('Missing ADMIN_EMAIL or ADMIN_PASSWORD in environment variables');
+  }
+
+  const passwordHash = await hashPassword(adminPassword);
   await prisma.admin.upsert({
-    where: { email: 'admin@cador.digital' },
-    update: {},
+    where: { email: adminEmail },
+    update: { password: passwordHash, role: 'admin' },
     create: {
-      email: 'admin@cador.digital',
+      email: adminEmail,
       password: passwordHash,
       role: 'admin',
     },
   });
-  console.log('Admin created.');
+  console.log(`Admin upserted: ${adminEmail}`);
 
   const services = [
     {
