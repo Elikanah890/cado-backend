@@ -37,15 +37,15 @@ export const adminController = {
 
       res.cookie('auth_token', token, {
         httpOnly: true,
-        secure: config.nodeEnv === 'production' && config.frontendUrl.startsWith('https://'),
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.cookie('refresh_token', refreshToken, {
         httpOnly: true,
-        secure: config.nodeEnv === 'production' && config.frontendUrl.startsWith('https://'),
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: '/api/admin/refresh',
       });
@@ -71,8 +71,8 @@ export const adminController = {
 
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      res.clearCookie('auth_token');
-      res.clearCookie('refresh_token', { path: '/api/admin/refresh' });
+      res.clearCookie('auth_token', { httpOnly: true, secure: true, sameSite: 'none' });
+      res.clearCookie('refresh_token', { httpOnly: true, secure: true, sameSite: 'none', path: '/api/admin/refresh' });
       return res.json({ status: 'success', code: 200, message: 'Logged out successfully' });
     } catch (error) {
       next(error);
@@ -100,15 +100,15 @@ export const adminController = {
 
       res.cookie('auth_token', newToken, {
         httpOnly: true,
-        secure: config.nodeEnv === 'production' && config.frontendUrl.startsWith('https://'),
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
-        secure: config.nodeEnv === 'production' && config.frontendUrl.startsWith('https://'),
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: '/api/admin/refresh',
       });
