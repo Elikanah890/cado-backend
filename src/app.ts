@@ -33,6 +33,8 @@ import publicSettingsRoutes from './routes/settings.routes';
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false, crossOriginEmbedderPolicy: false }));
 
 const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['https://cado-frontend-kappa.vercel.app'];
