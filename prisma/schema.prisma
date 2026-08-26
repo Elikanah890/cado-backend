@@ -162,7 +162,7 @@ model CourseLesson {
   isFree        Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  course        Course   @relation(fields: [courseId], references: [id])
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model BlogCategory {
@@ -199,15 +199,15 @@ model BlogPost {
   publishedAt   DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  category      BlogCategory? @relation(fields: [categoryId], references: [id])
+  category      BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   tags          BlogPostTag[]
 }
 
 model BlogPostTag {
   postId String
   tagId  String
-  post   BlogPost @relation(fields: [postId], references: [id])
-  tag    BlogTag  @relation(fields: [tagId], references: [id])
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    BlogTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([postId, tagId])
 }

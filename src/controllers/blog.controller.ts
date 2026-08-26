@@ -194,9 +194,13 @@ export const adminBlogController = {
 
   async deletePost(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      await prisma.blogPost.delete({ where: { id: req.params.id } });
+      const { id } = req.params;
+      // Delete join table entries first (handles DB without Cascade)
+      await prisma.blogPostTag.deleteMany({ where: { postId: id } });
+      await prisma.blogPost.delete({ where: { id } });
       return res.json({ status: 'success', code: 200, message: 'Post deleted' });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2025') return res.status(404).json({ status: 'error', code: 404, message: 'Post not found' });
       next(error);
     }
   },
@@ -238,9 +242,14 @@ export const adminBlogController = {
 
   async deleteCategory(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      await prisma.blogCategory.delete({ where: { id: req.params.id } });
+      const { id } = req.params;
+      // Set categoryId to null on related posts before delete (handles SetNull before migration)
+      await prisma.blogPost.updateMany({ where: { categoryId: id }, data: { categoryId: null } });
+      await prisma.blogCategory.delete({ where: { id } });
       return res.json({ status: 'success', code: 200, message: 'Category deleted' });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2025') return res.status(404).json({ status: 'error', code: 404, message: 'Category not found' });
+      if (error.code === 'P2003') return res.status(400).json({ status: 'error', code: 400, message: 'Cannot delete category with existing posts. Remove category from posts first.' });
       next(error);
     }
   },
@@ -278,9 +287,12 @@ export const adminBlogController = {
 
   async deleteTag(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      await prisma.blogTag.delete({ where: { id: req.params.id } });
+      const { id } = req.params;
+      await prisma.blogPostTag.deleteMany({ where: { tagId: id } });
+      await prisma.blogTag.delete({ where: { id } });
       return res.json({ status: 'success', code: 200, message: 'Tag deleted' });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2025') return res.status(404).json({ status: 'error', code: 404, message: 'Tag not found' });
       next(error);
     }
   },

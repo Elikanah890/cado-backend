@@ -107,16 +107,22 @@ export const adminCourseController = {
         data,
       });
       return res.json({ status: 'success', code: 200, data: course });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2025') return res.status(404).json({ status: 'error', code: 404, message: 'Course not found' });
       next(error);
     }
   },
 
   async delete(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      await prisma.course.delete({ where: { id: req.params.id } });
+      const { id } = req.params;
+      // Delete lessons first (handles DB without Cascade)
+      await prisma.courseLesson.deleteMany({ where: { courseId: id } });
+      await prisma.course.delete({ where: { id } });
       return res.json({ status: 'success', code: 200, message: 'Course deleted' });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2025') return res.status(404).json({ status: 'error', code: 404, message: 'Course not found' });
+      if (error.code === 'P2003') return res.status(400).json({ status: 'error', code: 400, message: 'Cannot delete course with existing lessons. Remove lessons first.' });
       next(error);
     }
   },
@@ -143,7 +149,8 @@ export const adminCourseController = {
         data,
       });
       return res.json({ status: 'success', code: 200, data: lesson });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2025') return res.status(404).json({ status: 'error', code: 404, message: 'Lesson not found' });
       next(error);
     }
   },
@@ -152,7 +159,8 @@ export const adminCourseController = {
     try {
       await prisma.courseLesson.delete({ where: { id: req.params.lessonId || req.params.id } });
       return res.json({ status: 'success', code: 200, message: 'Lesson deleted' });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2025') return res.status(404).json({ status: 'error', code: 404, message: 'Lesson not found' });
       next(error);
     }
   },
