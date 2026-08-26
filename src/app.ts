@@ -35,7 +35,7 @@ const app = express();
 
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false, crossOriginEmbedderPolicy: false }));
 
-const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['http://localhost:3000'];
+const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['https://cado-frontend-kappa.vercel.app'];
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
