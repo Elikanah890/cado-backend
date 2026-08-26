@@ -96,9 +96,9 @@ app.use('/api/settings', publicSettingsRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   logger.info(`CadorDigital API server running on port ${PORT}`);
   logger.info(`Environment: ${config.nodeEnv}`);
   logger.info(`Frontend URL: ${config.frontendUrl}`);
