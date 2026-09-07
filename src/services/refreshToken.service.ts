@@ -8,6 +8,8 @@ const ttlSeconds = (days: number): number => days * 24 * 60 * 60;
 // Stores a refresh token jti keyed to an admin id. Rotation makes refresh
 // tokens single-use: consumeRefreshToken deletes the jti after a successful read.
 export async function storeRefreshToken(jti: string, adminId: string, days = 7): Promise<void> {
+  if (!redis) return;
+
   try {
     await redis.set(`${PREFIX}${jti}`, adminId, 'EX', ttlSeconds(days));
   } catch (error) {
@@ -19,6 +21,8 @@ export async function storeRefreshToken(jti: string, adminId: string, days = 7):
 // is unknown or belongs to a different admin. If Redis is unavailable this
 // fails open to preserve availability (tokenVersion is still enforced at the DB).
 export async function consumeRefreshToken(jti: string, adminId: string): Promise<boolean> {
+  if (!redis) return true;
+
   try {
     const owner = await redis.get(`${PREFIX}${jti}`);
     if (owner !== adminId) return false;
@@ -31,6 +35,8 @@ export async function consumeRefreshToken(jti: string, adminId: string): Promise
 }
 
 export async function revokeRefreshToken(jti: string): Promise<void> {
+  if (!redis) return;
+
   try {
     await redis.del(`${PREFIX}${jti}`);
   } catch (error) {

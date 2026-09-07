@@ -13,25 +13,31 @@ const CACHE_KEYS = [
 ];
 
 async function getCached<T>(key: string, loader: () => Promise<T>): Promise<T> {
-  try {
-    const cached = await redis.get(key);
-    if (cached) return JSON.parse(cached) as T;
-  } catch (error) {
-    console.warn(`Redis read failed for ${key}:`, error);
+  if (redis) {
+    try {
+      const cached = await redis.get(key);
+      if (cached) return JSON.parse(cached) as T;
+    } catch (error) {
+      console.warn(`Redis read failed for ${key}:`, error);
+    }
   }
 
   const value = await loader();
 
-  try {
-    await redis.setex(key, CACHE_TTL_SECONDS, JSON.stringify(value));
-  } catch (error) {
-    console.warn(`Redis write failed for ${key}:`, error);
+  if (redis) {
+    try {
+      await redis.setex(key, CACHE_TTL_SECONDS, JSON.stringify(value));
+    } catch (error) {
+      console.warn(`Redis write failed for ${key}:`, error);
+    }
   }
 
   return value;
 }
 
 export async function invalidateHomepageCache() {
+  if (!redis) return;
+
   try {
     await redis.del(...CACHE_KEYS);
   } catch (error) {
