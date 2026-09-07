@@ -62,25 +62,6 @@ export const portfolioSchema = z.object({
   publishedAt: z.any().optional().nullable(),
 });
 
-export const storeProductSchema = z.object({
-  slug: z.string().min(1),
-  name: z.string().min(1),
-  description: z.string().optional().nullable(),
-  category: z.string().optional().nullable(),
-  price: z.number().min(0),
-  currency: z.string().optional().default('TZS'),
-  fileUrl: z.string().optional().nullable(),
-  fileSize: z.string().optional().nullable(),
-  previewImages: z.any().optional().nullable(),
-  featuredImage: z.string().optional().nullable(),
-  galleryImages: z.any().optional().nullable(),
-  downloadLink: z.string().optional().nullable(),
-  sortOrder: z.number().optional().default(0),
-  seo: z.any().optional().nullable(),
-  isActive: z.boolean().optional(),
-  isFeatured: z.boolean().optional(),
-});
-
 export const courseSchema = z.object({
   slug: z.string().min(1),
   title: z.string().min(1),
@@ -91,17 +72,35 @@ export const courseSchema = z.object({
   instructorAvatar: z.string().optional().nullable(),
   thumbnail: z.string().optional().nullable(),
   featuredImage: z.string().optional().nullable(),
-  price: z.number().min(0).optional().nullable(),
+  introVideo: z.string().optional().nullable(),
+  whatsappNumber: z.string().optional().nullable(),
+  price: z.union([
+    z.number().min(0),
+    z.string().transform((v) => (v === '' || v.trim() === '' ? null : Number(v))),
+    z.null(),
+    z.undefined(),
+  ]).optional(),
   currency: z.string().optional().default('TZS'),
   level: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
-  estimatedHours: z.number().optional().nullable(),
+  estimatedHours: z.union([
+    z.number(),
+    z.string().transform((v) => (v === '' || v.trim() === '' ? null : Number(v))),
+    z.null(),
+    z.undefined(),
+  ]).optional(),
   isPublished: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   isActive: z.boolean().optional(),
-  sortOrder: z.number().optional(),
+  sortOrder: z.union([z.number(), z.string().transform((v) => Number(v)), z.undefined()]).optional(),
   instructor: z.string().optional().nullable(),
   seo: z.any().optional().nullable(),
+  modules: z.any().optional(),
+});
+
+export const courseModuleSchema = z.object({
+  title: z.string().min(1),
+  sortOrder: z.union([z.number(), z.string().transform((v) => Number(v)), z.null(), z.undefined()]).optional(),
 });
 
 export const blogPostSchema = z.object({
@@ -167,8 +166,12 @@ export const adminProfileSchema = z.object({
 });
 
 export const adminPasswordSchema = z.object({
-  currentPassword: z.string().min(6, 'Current password must be at least 6 characters'),
-  newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string()
+    .min(8, 'New password must be at least 8 characters')
+    .max(128, 'New password must be at most 128 characters')
+    .regex(/[A-Za-z]/, 'New password must contain a letter')
+    .regex(/[0-9]/, 'New password must contain a number'),
   confirmPassword: z.string().min(8, 'Confirm password must be at least 8 characters'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: 'Passwords do not match',
@@ -186,13 +189,14 @@ export const servicePackageSchema = z.object({
 
 export const courseLessonSchema = z.object({
   title: z.string().min(1),
-  description: z.string().optional(),
-  videoUrl: z.string().optional(),
-  videoDuration: z.number().optional(),
-  lessonType: z.string().default('video'),
-  content: z.string().optional(),
-  sortOrder: z.number().optional(),
-  isFree: z.boolean().optional(),
+  description: z.string().optional().nullable(),
+  videoUrl: z.string().optional().nullable(),
+  videoDuration: z.union([z.number(), z.string().transform((v) => (v === '' ? null : Number(v))), z.null(), z.undefined()]).optional(),
+  lessonType: z.string().optional().default('video'),
+  content: z.string().optional().nullable(),
+  moduleId: z.string().optional().nullable(),
+  sortOrder: z.union([z.number(), z.string().transform((v) => Number(v)), z.null(), z.undefined()]).optional(),
+  isFree: z.union([z.boolean(), z.string().transform((v) => v === 'true'), z.null(), z.undefined()]).optional(),
 });
 
 export const hostingPlanSchema = z.object({

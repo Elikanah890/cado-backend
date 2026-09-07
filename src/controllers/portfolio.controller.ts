@@ -135,6 +135,7 @@ export const adminPortfolioController = {
       if (data.featuredImage === '') data.featuredImage = null;
       // Ensure techStack is array
       if (data.techStack && !Array.isArray(data.techStack)) data.techStack = [];
+      if (data.galleryImages && !Array.isArray(data.galleryImages)) data.galleryImages = [];
       if (data.sortOrder !== undefined) data.sortOrder = Number(data.sortOrder) || 0;
       // Ensure status defaults
       if (!data.status) data.status = 'COMPLETED';
@@ -158,6 +159,7 @@ export const adminPortfolioController = {
       if (data.videoUrl === '') data.videoUrl = null;
       if (data.featuredImage === '') data.featuredImage = null;
       if (data.techStack && !Array.isArray(data.techStack)) data.techStack = [];
+      if (data.galleryImages && !Array.isArray(data.galleryImages)) data.galleryImages = [];
       if (data.sortOrder !== undefined) data.sortOrder = Number(data.sortOrder) || 0;
 
       const portfolio = await prisma.portfolio.update({

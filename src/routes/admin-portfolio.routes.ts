@@ -5,11 +5,13 @@ import { adminLimiter } from '../middleware/rateLimiter';
 import { activityLogger } from '../middleware/activityLogger';
 import { validate } from '../middleware/validate';
 import { portfolioSchema } from '../utils/validators';
+import { invalidateHomepageCacheOnWrite } from '../middleware/invalidateHomepageCache';
 
 const router = Router();
 
 router.use(authenticate);
 router.use(adminLimiter);
+router.use(invalidateHomepageCacheOnWrite);
 
 // Category management
 router.get('/categories', adminPortfolioController.getCategories);

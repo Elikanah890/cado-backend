@@ -5,11 +5,13 @@ import { adminLimiter } from '../middleware/rateLimiter';
 import { activityLogger } from '../middleware/activityLogger';
 import { validate } from '../middleware/validate';
 import { testimonialSchema } from '../utils/validators';
+import { invalidateHomepageCacheOnWrite } from '../middleware/invalidateHomepageCache';
 
 const router = Router();
 
 router.use(authenticate);
 router.use(adminLimiter);
+router.use(invalidateHomepageCacheOnWrite);
 
 router.get('/', adminTestimonialController.getAll);
 router.post('/', validate(testimonialSchema), activityLogger('Create Testimonial', 'testimonials'), adminTestimonialController.create);

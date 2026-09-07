@@ -7,6 +7,6 @@ import { contactSchema, newsletterSchema } from '../utils/validators';
 const router = Router();
 
 router.post('/contact', contactLimiter, validate(contactSchema), leadController.create);
-router.post('/newsletter', validate(newsletterSchema), leadController.newsletter);
+router.post('/newsletter', contactLimiter, validate(newsletterSchema), leadController.newsletter);
 
 export default router;

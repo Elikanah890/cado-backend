@@ -14,8 +14,6 @@ import portfolioRoutes from './routes/portfolio.routes';
 import adminPortfolioRoutes from './routes/admin-portfolio.routes';
 import blogRoutes from './routes/blog.routes';
 import adminBlogRoutes from './routes/admin-blog.routes';
-import storeRoutes from './routes/store.routes';
-import adminStoreRoutes from './routes/admin-store.routes';
 import courseRoutes from './routes/course.routes';
 import adminCourseRoutes from './routes/admin-course.routes';
 import contactRoutes from './routes/contact.routes';
@@ -30,6 +28,8 @@ import hostingRoutes from './routes/hosting.routes';
 import pricingRoutes from './routes/pricing.routes';
 import adminPricingRoutes from './routes/admin-pricing.routes';
 import publicSettingsRoutes from './routes/settings.routes';
+import visitorRoutes, { adminVisitorRoutes } from './routes/visitor.routes';
+import homepageRoutes from './routes/homepage.routes';
 
 const app = express();
 
@@ -73,12 +73,13 @@ app.get('/', (_req, res) => {
   res.json({ status: 'success', code: 200, message: 'CadorDigital API is running', timestamp: new Date().toISOString() });
 });
 
+app.use('/api', homepageRoutes);
+
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/dashboard', adminDashboardRoutes);
 app.use('/api/admin/services', adminServiceRoutes);
 app.use('/api/admin/portfolio', adminPortfolioRoutes);
 app.use('/api/admin/blog', adminBlogRoutes);
-app.use('/api/admin/store', adminStoreRoutes);
 app.use('/api/admin/courses', adminCourseRoutes);
 app.use('/api/admin/academy', adminCourseRoutes);
 app.use('/api/admin/leads', adminLeadRoutes);
@@ -87,11 +88,11 @@ app.use('/api/admin/settings', adminSettingsRoutes);
 app.use('/api/admin/media', adminMediaRoutes);
 app.use('/api/admin/activities', adminActivityRoutes);
 app.use('/api/admin/pricing', adminPricingRoutes);
+app.use('/api/admin/visitors', adminVisitorRoutes);
 
 app.use('/api/services', serviceRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/blog', blogRoutes);
-app.use('/api/store', storeRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/academy', courseRoutes);
 app.use('/api', contactRoutes);
@@ -99,6 +100,7 @@ app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/hosting', hostingRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/settings', publicSettingsRoutes);
+app.use('/api/visitors', visitorRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

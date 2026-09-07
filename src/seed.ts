@@ -102,14 +102,6 @@ async function seed() {
   }
   console.log('Services seeded.');
 
-  const products = [
-    { slug: 'company-profile-template', name: 'Company Profile Template', description: 'A polished company profile template for growing businesses.', category: 'Templates', price: 50000, currency: 'TZS', sortOrder: 1 },
-    { slug: 'digital-marketing-guide', name: 'Digital Marketing Guide', description: 'A practical guide to building a measurable digital marketing system.', category: 'Guides', price: 30000, currency: 'TZS', sortOrder: 2 },
-    { slug: 'business-proposal-pack', name: 'Business Proposal Pack', description: 'Reusable proposal layouts for professional client presentations.', category: 'Templates', price: 45000, currency: 'TZS', sortOrder: 3 },
-  ];
-  for (const product of products) await prisma.storeProduct.upsert({ where: { slug: product.slug }, update: product, create: product });
-  console.log('Store products seeded.');
-
   const courses = [
     { slug: 'digital-marketing-foundations', title: 'Digital Marketing Foundations', description: 'Learn the essential channels, planning, and measurement for digital growth.', instructor: 'CadorDigital Academy', price: 150000, currency: 'TZS', sortOrder: 1, isActive: true },
     { slug: 'website-planning-for-business', title: 'Website Planning for Business', description: 'Turn business goals into a clear, useful website plan.', instructor: 'CadorDigital Academy', price: 100000, currency: 'TZS', sortOrder: 2, isActive: true },
@@ -117,10 +109,16 @@ async function seed() {
   ];
   for (const course of courses) {
     const saved = await prisma.course.upsert({ where: { slug: course.slug }, update: course, create: course });
-    await prisma.courseLesson.createMany({ data: [
-      { courseId: saved.id, title: 'Introduction and outcomes', description: 'Understand the goals for this course.', sortOrder: 1 },
-      { courseId: saved.id, title: 'Putting the framework into practice', description: 'Apply the framework to a real business scenario.', sortOrder: 2 },
-    ], skipDuplicates: true });
+    const existingModules = await prisma.courseModule.count({ where: { courseId: saved.id } });
+    if (existingModules === 0) {
+      const module = await prisma.courseModule.create({
+        data: { courseId: saved.id, title: 'Introduction', sortOrder: 0 },
+      });
+      await prisma.courseLesson.createMany({ data: [
+        { moduleId: module.id, title: 'Introduction and outcomes', description: 'Understand the goals for this course.', sortOrder: 0 },
+        { moduleId: module.id, title: 'Putting the framework into practice', description: 'Apply the framework to a real business scenario.', sortOrder: 1 },
+      ], skipDuplicates: true });
+    }
   }
   console.log('Academy courses seeded.');
 

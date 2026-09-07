@@ -11,7 +11,6 @@ export const dashboardController = {
         servicesCount,
         portfolioCount,
         blogPostsCount,
-        productsCount,
         coursesCount,
         recentLeads,
       ] = await Promise.all([
@@ -20,7 +19,6 @@ export const dashboardController = {
         prisma.service.count({ where: { isActive: true } }),
         prisma.portfolio.count(),
         prisma.blogPost.count({ where: { status: 'published' } }),
-        prisma.storeProduct.count({ where: { isActive: true } }),
         prisma.course.count({ where: { isPublished: true } }),
         prisma.lead.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
       ]);
@@ -35,7 +33,6 @@ export const dashboardController = {
             servicesCount,
             portfolioCount,
             blogPostsCount,
-            productsCount,
             coursesCount,
           },
           recentLeads,

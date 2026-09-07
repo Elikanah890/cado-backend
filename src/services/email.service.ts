@@ -37,14 +37,22 @@ export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
   }
 };
 
+const escapeHtml = (value: string): string =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 export const emailTemplates = {
   contactReceived: (data: { name: string; email: string; message: string }) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #1E3A5F;">New Contact Message</h2>
-      <p><strong>From:</strong> ${data.name} (${data.email})</p>
+      <p><strong>From:</strong> ${escapeHtml(data.name)} (${escapeHtml(data.email)})</p>
       <p><strong>Message:</strong></p>
       <div style="background: #f5f5f5; padding: 16px; border-radius: 8px;">
-        ${data.message}
+        ${escapeHtml(data.message)}
       </div>
     </div>
   `,
@@ -52,8 +60,8 @@ export const emailTemplates = {
   courseEnrollment: (data: { studentName: string; courseTitle: string }) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #1E3A5F;">Course Enrollment Confirmed</h2>
-      <p>Dear ${data.studentName},</p>
-      <p>You have successfully enrolled in <strong>${data.courseTitle}</strong>.</p>
+      <p>Dear ${escapeHtml(data.studentName)},</p>
+      <p>You have successfully enrolled in <strong>${escapeHtml(data.courseTitle)}</strong>.</p>
       <p>Start learning today!</p>
     </div>
   `,
@@ -61,9 +69,9 @@ export const emailTemplates = {
   passwordReset: (data: { name: string; resetLink: string }) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #1E3A5F;">Password Reset Request</h2>
-      <p>Dear ${data.name},</p>
+      <p>Dear ${escapeHtml(data.name)},</p>
       <p>Click the link below to reset your password. This link expires in 1 hour.</p>
-      <p><a href="${data.resetLink}" style="background: #C9A84C; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Reset Password</a></p>
+      <p><a href="${escapeHtml(data.resetLink)}" style="background: #C9A84C; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Reset Password</a></p>
     </div>
   `,
 };

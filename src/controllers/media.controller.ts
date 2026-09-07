@@ -12,11 +12,12 @@ const ALLOWED_MIME_TYPES = [
   'application/pdf',
   'video/mp4',
   'video/webm',
+  'video/quicktime',
+  'video/x-msvideo',
+  'video/mpeg',
 ];
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-
-const ALLOWED_FOLDERS = ['general', 'services', 'portfolio', 'blog', 'store', 'courses', 'team', 'settings'];
+const ALLOWED_FOLDERS = ['general', 'services', 'portfolio', 'blog', 'courses', 'course', 'team', 'settings'];
 
 function sanitizeFolder(folder: string): string {
   const normalized = path.normalize(folder).replace(/^(\.\.(\/|\\|$))+/, '');
@@ -67,15 +68,6 @@ export const mediaController = {
         return res.status(400).json({ status: 'error', code: 400, message: 'No file provided' });
       }
 
-      // Validate file size
-      if (file.size > MAX_FILE_SIZE) {
-        return res.status(400).json({ 
-          status: 'error', 
-          code: 400, 
-          message: `File size exceeds maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)} MB` 
-        });
-      }
-
       // Validate MIME type
       if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
         return res.status(400).json({ 
@@ -110,6 +102,7 @@ export const mediaController = {
 
       return res.status(201).json({ status: 'success', code: 201, data: media });
     } catch (error) {
+      console.error('[media.upload] Upload failed:', error);
       next(error);
     }
   },

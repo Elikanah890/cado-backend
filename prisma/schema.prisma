@@ -8,13 +8,14 @@ datasource db {
 }
 
 model Admin {
-  id         String        @id @default(cuid())
-  email      String        @unique
-  password   String        @map("password")
-  role       String        @default("admin")
-  createdAt  DateTime      @default(now()) @map("created_at")
-  updatedAt  DateTime      @updatedAt @map("updated_at")
-  activities ActivityLog[]
+  id           String        @id @default(cuid())
+  email        String        @unique
+  password     String        @map("password")
+  role         String        @default("admin")
+  tokenVersion Int           @default(0) @map("token_version")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  activities   ActivityLog[]
 }
 
 model ActivityLog {
@@ -84,6 +85,7 @@ model Portfolio {
   testimonialPosition String?
   clientTestimonial   Json?
   featuredImage       String?
+  galleryImages       Json?
   videoUrl            String?
   techStack           String[]        @default([])
   status              PortfolioStatus @default(COMPLETED)
@@ -98,29 +100,6 @@ model Portfolio {
   updatedAt           DateTime        @updatedAt
 }
 
-model StoreProduct {
-  id             String      @id @default(cuid())
-  slug           String      @unique
-  name           String
-  description    String?
-  category       String?
-  price          Float
-  currency       String      @default("TZS")
-  fileUrl        String?
-  fileSize       String?
-  previewImages  Json?
-  featuredImage  String?
-  galleryImages  Json?
-  downloadLink   String?
-  sortOrder      Int         @default(0)
-  seo            Json?
-  isActive       Boolean     @default(true)
-  isFeatured     Boolean     @default(false)
-  downloadsCount Int         @default(0)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-}
-
 model Course {
   id               String         @id @default(cuid())
   slug             String         @unique
@@ -132,6 +111,8 @@ model Course {
   instructorAvatar String?
   thumbnail        String?
   featuredImage    String?
+  introVideo       String?
+  whatsappNumber   String?
   price            Float?
   currency         String         @default("TZS")
   level            String?
@@ -146,23 +127,34 @@ model Course {
   enrolledCount    Int            @default(0)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
-  lessons          CourseLesson[]
+  modules          CourseModule[]
+}
+
+model CourseModule {
+  id          String         @id @default(cuid())
+  courseId     String
+  title       String
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  course      Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons     CourseLesson[]
 }
 
 model CourseLesson {
-  id            String   @id @default(cuid())
-  courseId      String
+  id            String      @id @default(cuid())
+  moduleId      String
   title         String
   description   String?
   videoUrl      String?
   videoDuration Int?
-  lessonType    String   @default("video")
+  lessonType    String      @default("video")
   content       String?
-  sortOrder     Int      @default(0)
-  isFree        Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sortOrder     Int         @default(0)
+  isFree        Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  module        CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 }
 
 model BlogCategory {
@@ -183,24 +175,32 @@ model BlogTag {
 }
 
 model BlogPost {
-  id            String        @id @default(cuid())
-  slug          String        @unique
-  title         String
-  excerpt       String?
-  content       String
-  featuredImage String?
-  categoryId    String?
-  authorName    String?
-  status        String        @default("draft")
-  views         Int           @default(0)
-  viewCount     Int           @default(0)
-  sortOrder     Int           @default(0)
-  seo           Json?
-  publishedAt   DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  category      BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  tags          BlogPostTag[]
+  id              String         @id @default(cuid())
+  slug            String         @unique
+  title           String
+  excerpt         String?
+  content         String
+  featuredImage   String?
+  galleryImages   Json?
+  categoryId      String?
+  authorName      String?
+  status          String         @default("draft")
+  views           Int            @default(0)
+  viewCount       Int            @default(0)
+  sortOrder       Int            @default(0)
+  readTime        Int?
+  scheduledAt     DateTime?
+  seo             Json?
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  ogImage         String?
+  publishedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  category        BlogCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags            BlogPostTag[]
+  comments        Comment[]
 }
 
 model BlogPostTag {
@@ -210,6 +210,17 @@ model BlogPostTag {
   tag    BlogTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([postId, tagId])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  name       String
+  email      String?
+  content    String
+  postId     String
+  post       BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }
 
 model Lead {
@@ -310,4 +321,19 @@ model Media {
   uploadedBy String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Visitor {
+  id          String   @id @default(cuid())
+  path        String
+  deviceType  String   @default("desktop")
+  isReturning Boolean  @default(false)
+  visitorId   String?
+  referrer    String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+  @@index([deviceType])
+  @@index([visitorId])
 }

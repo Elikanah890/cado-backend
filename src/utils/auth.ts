@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { config } from '../config';
 
 export const hashPassword = async (password: string): Promise<string> => {
@@ -10,14 +11,21 @@ export const comparePassword = async (password: string, hash: string): Promise<b
   return bcrypt.compare(password, hash);
 };
 
-export const generateToken = (payload: { id: string; email: string; role: string }): string => {
-  return jwt.sign(payload, config.jwt.secret, {
+export interface TokenPayload {
+  id: string;
+  email: string;
+  role: string;
+  tokenVersion: number;
+}
+
+export const generateToken = (payload: TokenPayload): string => {
+  return jwt.sign({ ...payload, type: 'access' }, config.jwt.secret, {
     expiresIn: config.jwt.expiry as any,
   });
 };
 
-export const generateRefreshToken = (payload: { id: string; email: string; role: string }): string => {
-  return jwt.sign(payload, config.jwt.refreshSecret, {
+export const generateRefreshToken = (payload: TokenPayload): string => {
+  return jwt.sign({ ...payload, jti: crypto.randomUUID(), type: 'refresh' }, config.jwt.refreshSecret, {
     expiresIn: config.jwt.refreshExpiry as any,
   });
 };
@@ -31,5 +39,5 @@ export const verifyRefreshToken = (token: string): any => {
 };
 
 export const generatePasswordResetToken = (): string => {
-  return require('crypto').randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString('hex');
 };

@@ -13,11 +13,13 @@ import {
   hostingPlanSchema,
   customServiceSchema,
 } from '../validations/pricing.validation';
+import { invalidateHomepageCacheOnWrite } from '../middleware/invalidateHomepageCache';
 
 const router = Router();
 
 router.use(authenticate);
 router.use(adminLimiter);
+router.use(invalidateHomepageCacheOnWrite);
 
 // Pricing Plans (Startup Bundles)
 router.get('/plans', adminPricingPlanController.getAll);

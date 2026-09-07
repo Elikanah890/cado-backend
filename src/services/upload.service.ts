@@ -34,6 +34,9 @@ export const uploadToCloudinary = async (file: Express.Multer.File, folder: stri
   const axios = (await import('axios')).default;
   const { v4: uuid } = await import('uuid');
 
+  const isVideo = file.mimetype.startsWith('video/');
+  const resourceType = isVideo ? 'video' : 'image';
+
   const formData = new FormData();
   formData.append('file', file.buffer, file.originalname);
   formData.append('upload_preset', 'cador_upload');
@@ -41,7 +44,7 @@ export const uploadToCloudinary = async (file: Express.Multer.File, folder: stri
   formData.append('public_id', `cador_${uuid()}`);
 
   const response = await axios.post(
-    `https://api.cloudinary.com/v1_1/${config.cloudinary.cloudName}/image/upload`,
+    `https://api.cloudinary.com/v1_1/${config.cloudinary.cloudName}/${resourceType}/upload`,
     formData,
     { headers: { ...formData.getHeaders() } }
   );
