@@ -133,6 +133,8 @@ export const adminPortfolioController = {
       if (data.projectUrl === '') data.projectUrl = null;
       if (data.videoUrl === '') data.videoUrl = null;
       if (data.featuredImage === '') data.featuredImage = null;
+      if (data.pdfUrl === '') data.pdfUrl = null;
+      if (data.pdfName === '') data.pdfName = null;
       // Ensure techStack is array
       if (data.techStack && !Array.isArray(data.techStack)) data.techStack = [];
       if (data.galleryImages && !Array.isArray(data.galleryImages)) data.galleryImages = [];
@@ -158,6 +160,8 @@ export const adminPortfolioController = {
       if (data.projectUrl === '') data.projectUrl = null;
       if (data.videoUrl === '') data.videoUrl = null;
       if (data.featuredImage === '') data.featuredImage = null;
+      if (data.pdfUrl === '') data.pdfUrl = null;
+      if (data.pdfName === '') data.pdfName = null;
       if (data.techStack && !Array.isArray(data.techStack)) data.techStack = [];
       if (data.galleryImages && !Array.isArray(data.galleryImages)) data.galleryImages = [];
       if (data.sortOrder !== undefined) data.sortOrder = Number(data.sortOrder) || 0;

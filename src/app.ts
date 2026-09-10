@@ -44,12 +44,31 @@ app.use(cors({
 }));
 
 // Validate required environment variables
-const requiredEnv = ['DATABASE_URL', 'JWT_SECRET', 'JWT_REFRESH_SECRET', 'FRONTEND_URL'];
+const requiredEnv = ['DATABASE_URL', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
 requiredEnv.forEach(env => {
   if (!process.env[env]) {
     throw new Error(`Missing ${env} in environment variables`);
   }
 });
+
+// Warn (but don't crash) on optional-but-important production configuration.
+// These silently degrade locally but break features in production.
+const isPlaceholder = (v?: string) =>
+  !v || /^your_/i.test(v) || /<[^>]+>/.test(v);
+
+const startupWarnings: string[] = [];
+if (!process.env.FRONTEND_URL) {
+  startupWarnings.push('FRONTEND_URL is not set — CORS will fall back to a default origin and the admin panel may be blocked in the browser.');
+}
+if (isPlaceholder(process.env.CLOUDINARY_CLOUD_NAME) || isPlaceholder(process.env.CLOUDINARY_API_KEY) || isPlaceholder(process.env.CLOUDINARY_API_SECRET)) {
+  startupWarnings.push('Cloudinary is not configured — uploads fall back to local disk, which is EPHEMERAL on Render (files are lost on redeploy).');
+}
+if (!process.env.REDIS_URL) {
+  startupWarnings.push('REDIS_URL is not set — caching, rate limiting and refresh-token rotation will be disabled.');
+}
+if (isPlaceholder(process.env.RESEND_API_KEY)) {
+  startupWarnings.push('RESEND_API_KEY is not set — transactional emails will not be sent.');
+}
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -111,6 +130,10 @@ app.listen(PORT, '0.0.0.0', () => {
   logger.info(`CadorDigital API server running on port ${PORT}`);
   logger.info(`Environment: ${config.nodeEnv}`);
   logger.info(`Frontend URL: ${config.frontendUrl}`);
+  if (startupWarnings.length > 0) {
+    logger.warn('Configuration warnings:');
+    startupWarnings.forEach((warning) => logger.warn(`  - ${warning}`));
+  }
 });
 
 export default app;

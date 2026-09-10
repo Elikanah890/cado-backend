@@ -34,7 +34,7 @@ export const adminLimiter = rateLimit({
 
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 50,
   ...(redis ? { store: redisStore('auth') } : {}),
   skipSuccessfulRequests: true,
   ...limiterOptions,

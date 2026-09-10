@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { hashPassword } from './utils/auth';
 
 const prisma = new PrismaClient();
@@ -102,10 +102,135 @@ async function seed() {
   }
   console.log('Services seeded.');
 
+  const portfolios = [
+    {
+      slug: 'safari-adventures-company-profile',
+      title: 'Safari Adventures Ltd — Company Profile',
+      clientName: 'Safari Adventures Ltd',
+      industry: 'Tourism & Travel',
+      category: 'Company Profiles (PDF)',
+      projectUrl: null,
+      challenge: 'Safari Adventures needed a polished company profile to present to international tour operators and corporate partners ahead of the peak season.',
+      solution: 'We designed a 24-page company profile document combining custom photography, brand storytelling and a clear service catalogue.',
+      results: 'The profile helped Safari Adventures secure partnerships with 3 international tour operators and win a corporate travel retainer.',
+      featuredImage: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+      galleryImages: Prisma.JsonNull,
+      videoUrl: null,
+      pdfUrl: '/uploads/portfolio/safari-adventures-company-profile.pdf',
+      pdfName: 'Safari Adventures Company Profile.pdf',
+      techStack: ['Adobe InDesign', 'Illustrator', 'Brand Guidelines'],
+      status: 'COMPLETED' as const,
+      completionDate: new Date('2026-06-15'),
+      isFeatured: true,
+      publishedAt: new Date('2026-06-20'),
+      seo: { metaTitle: 'Safari Adventures Company Profile — CadorDigital', metaDescription: 'A 24-page company profile designed for Safari Adventures Ltd.' },
+      sortOrder: 1,
+    },
+    {
+      slug: 'kilimanjaro-coffee-company-profile',
+      title: 'Kilimanjaro Coffee Exports — Company Profile',
+      clientName: 'Kilimanjaro Coffee Exports',
+      industry: 'Agriculture & Export',
+      category: 'Company Profiles (PDF)',
+      projectUrl: null,
+      challenge: 'The exporter wanted a bilingual (English/Swahili) company profile to share with international coffee buyers and trade fairs.',
+      solution: 'We produced a bilingual 20-page profile highlighting sourcing, quality control and their farmer network with infographics.',
+      results: 'The profile was distributed at the East Africa Coffee Expo and generated several new buyer enquiries.',
+      featuredImage: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1200&q=80',
+      galleryImages: Prisma.JsonNull,
+      videoUrl: null,
+      pdfUrl: '/uploads/portfolio/kilimanjaro-coffee-company-profile.pdf',
+      pdfName: 'Kilimanjaro Coffee Exports Company Profile.pdf',
+      techStack: ['Adobe InDesign', 'Photoshop', 'Infographics'],
+      status: 'COMPLETED' as const,
+      completionDate: new Date('2026-05-02'),
+      isFeatured: true,
+      publishedAt: new Date('2026-05-10'),
+      seo: { metaTitle: 'Kilimanjaro Coffee Exports Company Profile — CadorDigital' },
+      sortOrder: 2,
+    },
+    {
+      slug: 'serengeti-booking-platform',
+      title: 'Serengeti Safari Booking Platform',
+      clientName: 'Serengeti Tours Co.',
+      industry: 'Tourism & Travel',
+      category: 'Web Development',
+      projectUrl: 'https://serengetitours.example.com',
+      challenge: 'Serengeti Tours was losing bookings to international aggregators and needed a direct-booking website with real-time availability.',
+      solution: 'We built a custom booking platform with tour listings, availability calendars, M-Pesa payments and WhatsApp confirmation.',
+      results: 'Direct bookings increased by 40% within three months and the company reduced commission fees paid to third parties.',
+      featuredImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+      galleryImages: [{ url: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80', alt: 'Dashboard view' }, { url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80', alt: 'Booking flow' }],
+      videoUrl: null,
+      pdfUrl: null,
+      pdfName: null,
+      techStack: ['Next.js', 'Node.js', 'PostgreSQL', 'M-Pesa API', 'Tailwind CSS'],
+      status: 'COMPLETED' as const,
+      completionDate: new Date('2026-04-18'),
+      isFeatured: true,
+      publishedAt: new Date('2026-04-25'),
+      seo: { metaTitle: 'Serengeti Safari Booking Platform — CadorDigital' },
+      sortOrder: 3,
+    },
+    {
+      slug: 'mama-zawadi-brand-identity',
+      title: 'Mama Zawadi Fashion Brand Identity',
+      clientName: 'Mama Zawadi Fashion House',
+      industry: 'Fashion & Retail',
+      category: 'Branding',
+      projectUrl: null,
+      challenge: 'A growing fashion label needed a memorable brand identity to stand out at markets and on social media.',
+      solution: 'We created a full identity: logo suite, colour palette, typography, packaging design and social media templates.',
+      results: 'The new identity lifted engagement and helped the brand secure shelf space in two retail boutiques.',
+      featuredImage: 'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80',
+      galleryImages: [{ url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80', alt: 'Brand collateral' }],
+      videoUrl: null,
+      pdfUrl: null,
+      pdfName: null,
+      techStack: ['Adobe Illustrator', 'Photoshop', 'Figma'],
+      status: 'COMPLETED' as const,
+      completionDate: new Date('2026-03-30'),
+      isFeatured: false,
+      publishedAt: new Date('2026-04-05'),
+      seo: { metaTitle: 'Mama Zawadi Brand Identity — CadorDigital' },
+      sortOrder: 4,
+    },
+    {
+      slug: 'dar-express-delivery-app',
+      title: 'Dar Express Delivery App',
+      clientName: 'Dar Express Logistics',
+      industry: 'Logistics & Delivery',
+      category: 'Mobile App',
+      projectUrl: null,
+      challenge: 'Dar Express needed a mobile app for customers to book deliveries and for riders to manage orders in real time.',
+      solution: 'We designed and shipped a cross-platform app with live tracking, in-app chat, M-Pesa payments and an admin dispatch dashboard.',
+      results: 'Delivery fulfilment time dropped by 30% and customer retention improved thanks to live tracking.',
+      featuredImage: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+      galleryImages: Prisma.JsonNull,
+      videoUrl: null,
+      pdfUrl: null,
+      pdfName: null,
+      techStack: ['React Native', 'Node.js', 'PostgreSQL', 'Google Maps API', 'M-Pesa API'],
+      status: 'IN_PROGRESS' as const,
+      completionDate: null,
+      isFeatured: false,
+      publishedAt: new Date('2026-08-01'),
+      seo: { metaTitle: 'Dar Express Delivery App — CadorDigital' },
+      sortOrder: 5,
+    },
+  ];
+
+  for (const portfolio of portfolios) {
+    await prisma.portfolio.upsert({ where: { slug: portfolio.slug }, update: portfolio, create: portfolio });
+  }
+  console.log('Portfolio seeded.');
+
   const courses = [
-    { slug: 'digital-marketing-foundations', title: 'Digital Marketing Foundations', description: 'Learn the essential channels, planning, and measurement for digital growth.', instructor: 'CadorDigital Academy', price: 150000, currency: 'TZS', sortOrder: 1, isActive: true },
-    { slug: 'website-planning-for-business', title: 'Website Planning for Business', description: 'Turn business goals into a clear, useful website plan.', instructor: 'CadorDigital Academy', price: 100000, currency: 'TZS', sortOrder: 2, isActive: true },
-    { slug: 'brand-strategy-essentials', title: 'Brand Strategy Essentials', description: 'Build a distinctive brand foundation customers can remember.', instructor: 'CadorDigital Academy', price: null, currency: 'TZS', sortOrder: 3, isActive: true },
+    { slug: 'digital-marketing-foundations', title: 'Digital Marketing Foundations', subtitle: 'Master the channels, planning, and measurement that drive real growth.', description: '<p>Learn the essential digital marketing channels, how to plan a campaign, and how to measure what matters. This course covers social media, search, email, and content marketing with practical Tanzanian business examples.</p>', instructorName: 'Neema Mushi', category: 'Marketing', level: 'Beginner', estimatedHours: 12, price: 150000, currency: 'TZS', sortOrder: 1, isActive: true, isPublished: true, isFeatured: true },
+    { slug: 'website-planning-for-business', title: 'Website Planning for Business', subtitle: 'Turn business goals into a clear, useful website plan.', description: '<p>A practical guide to planning a business website: defining goals, structuring pages, writing copy that converts, and briefing a developer. No coding required.</p>', instructorName: 'Baraka John', category: 'Web Development', level: 'Beginner', estimatedHours: 8, price: 100000, currency: 'TZS', sortOrder: 2, isActive: true, isPublished: true },
+    { slug: 'brand-strategy-essentials', title: 'Brand Strategy Essentials', subtitle: 'Build a distinctive brand foundation customers remember.', description: '<p>Learn how to position your brand, define your audience, craft a brand voice, and design a visual identity that stands out in a crowded market.</p>', instructorName: 'Neema Mushi', category: 'Branding', level: 'Beginner', estimatedHours: 10, price: null, currency: 'TZS', sortOrder: 3, isActive: true, isPublished: true },
+    { slug: 'social-media-marketing-mastery', title: 'Social Media Marketing Mastery', subtitle: 'Grow an engaged audience and turn followers into customers.', description: '<p>From content calendars to paid campaigns, learn how to build a social media presence that generates leads on Instagram, Facebook, TikTok and LinkedIn.</p>', instructorName: 'Amina Said', category: 'Marketing', level: 'Intermediate', estimatedHours: 15, price: 180000, currency: 'TZS', sortOrder: 4, isActive: true, isPublished: true, isFeatured: true },
+    { slug: 'seo-for-small-business', title: 'SEO for Small Businesses', subtitle: 'Get found on Google without a big marketing budget.', description: '<p>Learn keyword research, on-page optimisation, local SEO and Google Business Profile setup so customers in Tanzania can find you online.</p>', instructorName: 'Baraka John', category: 'Marketing', level: 'Beginner', estimatedHours: 9, price: 120000, currency: 'TZS', sortOrder: 5, isActive: true, isPublished: true },
   ];
   for (const course of courses) {
     const saved = await prisma.course.upsert({ where: { slug: course.slug }, update: course, create: course });
@@ -123,7 +248,7 @@ async function seed() {
   console.log('Academy courses seeded.');
 
   const blogCategories = await Promise.all(['Marketing', 'Technology', 'Business'].map((name) => prisma.blogCategory.upsert({ where: { slug: name.toLowerCase() }, update: {}, create: { name, slug: name.toLowerCase() } })));
-  const tagNames = ['Strategy', 'Growth', 'Technology', 'Branding', 'Tanzania'];
+  const tagNames = ['Strategy', 'Growth', 'Technology', 'Branding', 'Tanzania', 'Marketing'];
   const tags = await Promise.all(tagNames.map((name) => prisma.blogTag.upsert({ where: { name }, update: {}, create: { name, slug: name.toLowerCase() } })));
   const posts = [
     ['Build a practical digital growth plan', 'Marketing', ['Strategy', 'Growth']],

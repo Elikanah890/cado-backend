@@ -87,6 +87,8 @@ model Portfolio {
   featuredImage       String?
   galleryImages       Json?
   videoUrl            String?
+  pdfUrl              String?
+  pdfName             String?
   techStack           String[]        @default([])
   status              PortfolioStatus @default(COMPLETED)
   completionDate      DateTime?
