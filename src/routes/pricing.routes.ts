@@ -6,7 +6,5 @@ const router = Router();
 
 router.get('/', publicLimiter, pricingPublicController.getPricing);
 router.get('/plans', publicLimiter, pricingPublicController.getPlans);
-router.get('/hosting', publicLimiter, pricingPublicController.getHosting);
-router.get('/custom', publicLimiter, pricingPublicController.getCustom);
 
 export default router;

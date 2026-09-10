@@ -198,15 +198,3 @@ export const courseLessonSchema = z.object({
   sortOrder: z.union([z.number(), z.string().transform((v) => Number(v)), z.null(), z.undefined()]).optional(),
   isFree: z.union([z.boolean(), z.string().transform((v) => v === 'true'), z.null(), z.undefined()]).optional(),
 });
-
-export const hostingPlanSchema = z.object({
-  slug: z.string().min(1),
-  name: z.string().min(1),
-  description: z.string().optional(),
-  price: z.number().positive(),
-  currency: z.string().default('TZS'),
-  billingPeriod: z.string().default('yearly'),
-  features: z.any().optional(),
-  isActive: z.boolean().optional(),
-  sortOrder: z.number().optional(),
-});

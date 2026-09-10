@@ -71,11 +71,11 @@ const blogPostsQuery = () => prisma.blogPost.findMany({
   take: 12,
 });
 
-const pricingQuery = () => Promise.all([
-  prisma.pricingPlan.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } }),
-  prisma.hostingPlan.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } }),
-  prisma.customService.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } }),
-]).then(([plans, hosting, custom]) => ({ plans, hosting, custom }));
+const pricingQuery = () => prisma.pricingCategory.findMany({
+  where: { isActive: true },
+  include: { plans: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } } },
+  orderBy: { sortOrder: 'asc' },
+}).then((categories) => ({ categories }));
 
 const academyQuery = () => prisma.course.findMany({
   where: { isActive: true },

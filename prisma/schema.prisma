@@ -258,22 +258,6 @@ model Testimonial {
   service       Service? @relation(fields: [serviceId], references: [id])
 }
 
-model HostingPlan {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  name          String
-  description   String?
-  price         Float
-  currency      String   @default("TZS")
-  billingPeriod String   @default("yearly")
-  features      Json?
-  isPopular     Boolean  @default(false)
-  isActive      Boolean  @default(true)
-  sortOrder     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
 model PricingCategory {
   id          String        @id @default(cuid())
   name        String
@@ -288,35 +272,21 @@ model PricingCategory {
 }
 
 model PricingPlan {
-  id         String           @id @default(cuid())
-  slug       String           @unique
-  name       String
-  tagline    String?
-  price      Float
-  currency   String           @default("TZS")
-  features   Json?
-  isPopular  Boolean          @default(false)
-  isActive   Boolean          @default(true)
-  sortOrder  Int              @default(0)
-  categoryId String?
-  period     String           @default("one-time")
-  category   PricingCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-}
-
-model CustomService {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  price     Float
-  currency  String   @default("TZS")
-  features  Json?
-  icon      String?
-  isActive  Boolean  @default(true)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String          @id @default(cuid())
+  categoryId  String
+  category    PricingCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String          @unique
+  price       Float
+  currency    String          @default("TZS")
+  period      String?
+  description String?
+  features    String[]
+  isPopular   Boolean         @default(false)
+  sortOrder   Int             @default(0)
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model Setting {

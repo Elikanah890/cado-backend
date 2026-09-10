@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import {
   adminPricingPlanController,
-  adminHostingPlanController,
-  adminCustomServiceController,
   adminPricingCategoryController,
 } from '../controllers/pricing.controller';
 import { authenticate } from '../middleware/auth';
@@ -11,8 +9,6 @@ import { activityLogger } from '../middleware/activityLogger';
 import { validate } from '../middleware/validate';
 import {
   pricingPlanSchema,
-  hostingPlanSchema,
-  customServiceSchema,
   pricingCategorySchema,
 } from '../validations/pricing.validation';
 import { invalidateHomepageCacheOnWrite } from '../middleware/invalidateHomepageCache';
@@ -29,22 +25,10 @@ router.post('/categories', validate(pricingCategorySchema), activityLogger('Crea
 router.put('/categories/:id', validate(pricingCategorySchema), activityLogger('Update Pricing Category', 'pricing'), adminPricingCategoryController.update);
 router.delete('/categories/:id', activityLogger('Delete Pricing Category', 'pricing'), adminPricingCategoryController.delete);
 
-// Pricing Plans (Startup Bundles)
+// Pricing Plans
 router.get('/plans', adminPricingPlanController.getAll);
 router.post('/plans', validate(pricingPlanSchema), activityLogger('Create Pricing Plan', 'pricing'), adminPricingPlanController.create);
 router.put('/plans/:id', validate(pricingPlanSchema), activityLogger('Update Pricing Plan', 'pricing'), adminPricingPlanController.update);
 router.delete('/plans/:id', activityLogger('Delete Pricing Plan', 'pricing'), adminPricingPlanController.delete);
-
-// Hosting Plans
-router.get('/hosting', adminHostingPlanController.getAll);
-router.post('/hosting', validate(hostingPlanSchema), activityLogger('Create Hosting Plan', 'pricing'), adminHostingPlanController.create);
-router.put('/hosting/:id', validate(hostingPlanSchema), activityLogger('Update Hosting Plan', 'pricing'), adminHostingPlanController.update);
-router.delete('/hosting/:id', activityLogger('Delete Hosting Plan', 'pricing'), adminHostingPlanController.delete);
-
-// Custom Services
-router.get('/custom', adminCustomServiceController.getAll);
-router.post('/custom', validate(customServiceSchema), activityLogger('Create Custom Service', 'pricing'), adminCustomServiceController.create);
-router.put('/custom/:id', validate(customServiceSchema), activityLogger('Update Custom Service', 'pricing'), adminCustomServiceController.update);
-router.delete('/custom/:id', activityLogger('Delete Custom Service', 'pricing'), adminCustomServiceController.delete);
 
 export default router;

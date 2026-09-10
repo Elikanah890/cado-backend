@@ -294,144 +294,31 @@ async function seed() {
     update: { name: 'Startup Bundles', description: 'All-in-one packages for launching and growing your business.', icon: 'rocket', sortOrder: 1, isActive: true },
     create: { slug: 'startup-bundles', name: 'Startup Bundles', description: 'All-in-one packages for launching and growing your business.', icon: 'rocket', sortOrder: 1, isActive: true },
   });
-  const marketingPlans = await prisma.pricingCategory.upsert({
-    where: { slug: 'marketing-plans' },
-    update: { name: 'Marketing Plans', description: 'Ongoing digital marketing retainers billed monthly.', icon: 'megaphone', sortOrder: 2, isActive: true },
-    create: { slug: 'marketing-plans', name: 'Marketing Plans', description: 'Ongoing digital marketing retainers billed monthly.', icon: 'megaphone', sortOrder: 2, isActive: true },
+  const hostingCategory = await prisma.pricingCategory.upsert({
+    where: { slug: 'hosting-plans' },
+    update: { name: 'Hosting Plans', description: 'Fast, reliable website hosting for every business.', icon: 'server', sortOrder: 2, isActive: true },
+    create: { slug: 'hosting-plans', name: 'Hosting Plans', description: 'Fast, reliable website hosting for every business.', icon: 'server', sortOrder: 2, isActive: true },
+  });
+  const customServices = await prisma.pricingCategory.upsert({
+    where: { slug: 'custom-services' },
+    update: { name: 'Custom Services', description: 'Standalone design and marketing services.', icon: 'wrench', sortOrder: 3, isActive: true },
+    create: { slug: 'custom-services', name: 'Custom Services', description: 'Standalone design and marketing services.', icon: 'wrench', sortOrder: 3, isActive: true },
   });
 
   // Pricing Plans
   const pricingPlans = [
-    {
-      slug: 'launch',
-      name: 'Launch',
-      tagline: 'For Startups & Small Businesses',
-      price: 1500000,
-      currency: 'TZS',
-      features: ['Logo & Brand Identity', '5-Page Website', 'Social Media Setup', 'Basic SEO', 'Business Email Setup', '3 Months Support'],
-      isPopular: false,
-      isActive: true,
-      sortOrder: 1,
-      categoryId: startupBundles.id,
-      period: 'one-time',
-    },
-    {
-      slug: 'grow',
-      name: 'Grow',
-      tagline: 'For Growing Companies',
-      price: 5000000,
-      currency: 'TZS',
-      features: ['Everything in Launch', '10-Page Website', 'E-Commerce Integration', 'Social Media Management', 'Advanced SEO', 'Content Marketing', 'Email Marketing Setup', '6 Months Support'],
-      isPopular: true,
-      isActive: true,
-      sortOrder: 2,
-      categoryId: startupBundles.id,
-      period: 'one-time',
-    },
-    {
-      slug: 'dominate',
-      name: 'Dominate',
-      tagline: 'For Enterprises',
-      price: 12000000,
-      currency: 'TZS',
-      features: ['Everything in Grow', 'Custom Web Application', 'AI Chatbot', 'Full Marketing Suite', 'CRM Integration', 'Analytics Dashboard', 'Priority Support', '12 Months Support'],
-      isPopular: false,
-      isActive: true,
-      sortOrder: 3,
-      categoryId: startupBundles.id,
-      period: 'one-time',
-    },
-    {
-      slug: 'social-media-growth',
-      name: 'Social Media Growth',
-      tagline: 'Monthly social media management',
-      price: 450000,
-      currency: 'TZS',
-      features: ['Content Calendar', '12 Posts / Month', 'Community Management', 'Monthly Report'],
-      isPopular: false,
-      isActive: true,
-      sortOrder: 1,
-      categoryId: marketingPlans.id,
-      period: 'month',
-    },
-    {
-      slug: 'full-marketing-suite',
-      name: 'Full Marketing Suite',
-      tagline: 'A complete outsourced marketing team',
-      price: 1500000,
-      currency: 'TZS',
-      features: ['Social Media', 'SEO', 'Email Marketing', 'Paid Ads', 'Content Marketing'],
-      isPopular: true,
-      isActive: true,
-      sortOrder: 2,
-      categoryId: marketingPlans.id,
-      period: 'month',
-    },
+    { slug: 'launch', name: 'Launch', description: 'For Startups & Small Businesses', price: 1500000, currency: 'TZS', period: 'one-time', features: ['Logo & Brand Identity', '5-Page Website', 'Social Media Setup', 'Basic SEO', '3 Months Support'], isPopular: false, isActive: true, sortOrder: 1, categoryId: startupBundles.id },
+    { slug: 'grow', name: 'Grow', description: 'For Growing Companies', price: 5000000, currency: 'TZS', period: 'one-time', features: ['Everything in Launch', '10-Page Website', 'E-Commerce', 'Advanced SEO', '6 Months Support'], isPopular: true, isActive: true, sortOrder: 2, categoryId: startupBundles.id },
+    { slug: 'starter', name: 'Starter', description: 'For personal websites', price: 300000, currency: 'TZS', period: 'year', features: ['1 Website', '10GB Storage', 'SSL', 'Email Support'], isPopular: false, isActive: true, sortOrder: 1, categoryId: hostingCategory.id },
+    { slug: 'business', name: 'Business', description: 'For growing businesses', price: 800000, currency: 'TZS', period: 'year', features: ['5 Websites', '50GB Storage', 'SSL', 'Priority Support', 'Daily Backups'], isPopular: true, isActive: true, sortOrder: 2, categoryId: hostingCategory.id },
+    { slug: 'ecommerce', name: 'Ecommerce', description: 'For online stores', price: 1500000, currency: 'TZS', period: 'year', features: ['10 Websites', '100GB Storage', 'SSL', '24/7 Support', 'CDN'], isPopular: false, isActive: true, sortOrder: 3, categoryId: hostingCategory.id },
+    { slug: 'logo-design', name: 'Logo Design', description: 'A memorable logo for your brand', price: 200000, currency: 'TZS', period: 'one-time', features: ['3 Concepts', 'Unlimited Revisions', 'Source Files'], isPopular: false, isActive: true, sortOrder: 1, categoryId: customServices.id },
+    { slug: 'landing-page', name: 'Landing Page', description: 'A high-converting single page', price: 500000, currency: 'TZS', period: 'one-time', features: ['Custom Design', 'Mobile Responsive', 'SEO Ready'], isPopular: false, isActive: true, sortOrder: 2, categoryId: customServices.id },
   ];
   for (const plan of pricingPlans) {
     await prisma.pricingPlan.upsert({ where: { slug: plan.slug }, update: plan, create: plan });
   }
   console.log('Pricing categories and plans seeded.');
-
-  // Hosting Plans
-  const hostingPlans = [
-    {
-      slug: 'starter',
-      name: 'Starter',
-      description: 'For personal websites',
-      price: 300000,
-      currency: 'TZS',
-      billingPeriod: 'yearly',
-      features: ['1 Website', '10GB Storage', '50GB Bandwidth', 'SSL Certificate', 'Email Support'],
-      isPopular: false,
-      isActive: true,
-      sortOrder: 1,
-    },
-    {
-      slug: 'business',
-      name: 'Business',
-      description: 'For growing businesses',
-      price: 800000,
-      currency: 'TZS',
-      billingPeriod: 'yearly',
-      features: ['5 Websites', '50GB Storage', '200GB Bandwidth', 'SSL Certificate', 'Priority Support', 'Daily Backups'],
-      isPopular: true,
-      isActive: true,
-      sortOrder: 2,
-    },
-    {
-      slug: 'ecommerce',
-      name: 'Ecommerce',
-      description: 'For online stores',
-      price: 1500000,
-      currency: 'TZS',
-      billingPeriod: 'yearly',
-      features: ['10 Websites', '100GB Storage', '500GB Bandwidth', 'SSL Certificate', '24/7 Support', 'Daily Backups', 'CDN Included'],
-      isPopular: false,
-      isActive: true,
-      sortOrder: 3,
-    },
-  ];
-  for (const plan of hostingPlans) {
-    await prisma.hostingPlan.upsert({ where: { slug: plan.slug }, update: {}, create: plan });
-  }
-  console.log('Hosting plans seeded.');
-
-  // Custom Services
-  const customServices = [
-    { slug: 'logo-design', name: 'Logo Design', price: 200000, currency: 'TZS', icon: 'palette', sortOrder: 1, isActive: true },
-    { slug: 'landing-page', name: 'Landing Page', price: 500000, currency: 'TZS', icon: 'globe', sortOrder: 2, isActive: true },
-    { slug: 'brand-guidelines', name: 'Brand Guidelines', price: 400000, currency: 'TZS', icon: 'palette', sortOrder: 3, isActive: true },
-    { slug: 'seo-audit', name: 'SEO Audit', price: 300000, currency: 'TZS', icon: 'bar-chart', sortOrder: 4, isActive: true },
-    { slug: 'social-media-graphics', name: 'Social Media Graphics', price: 150000, currency: 'TZS', icon: 'megaphone', sortOrder: 5, isActive: true },
-    { slug: 'business-card-design', name: 'Business Card Design', price: 80000, currency: 'TZS', icon: 'briefcase', sortOrder: 6, isActive: true },
-    { slug: 'company-profile', name: 'Company Profile', price: 250000, currency: 'TZS', icon: 'building', sortOrder: 7, isActive: true },
-    { slug: 'email-signature', name: 'Email Signature', price: 50000, currency: 'TZS', icon: 'code', sortOrder: 8, isActive: true },
-  ];
-  for (const svc of customServices) {
-    await prisma.customService.upsert({ where: { slug: svc.slug }, update: {}, create: svc });
-  }
-  console.log('Custom services seeded.');
 
   await prisma.setting.upsert({
     where: { key: 'company_name' },
