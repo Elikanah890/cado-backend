@@ -102,6 +102,27 @@ async function seed() {
   }
   console.log('Services seeded.');
 
+  // Testimonials (seeded once so admin-added testimonials are not overwritten)
+  if ((await prisma.testimonial.count()) === 0) {
+    const serviceIdBySlug: Record<string, string> = {};
+    for (const service of services) {
+      const saved = await prisma.service.findUnique({ where: { slug: service.slug } });
+      if (saved) serviceIdBySlug[service.slug] = saved.id;
+    }
+    const testimonials = [
+      { clientName: 'Neema Mushi', clientCompany: 'Founder, Safari Adventures Ltd', clientAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80', content: 'CadorDigital built us a website that doubled our direct bookings in four months. Professional, fast and always available.', rating: 5, isApproved: true, isFeatured: true, sortOrder: 1, serviceId: serviceIdBySlug['website-development'] },
+      { clientName: 'John Mwakyusa', clientCompany: 'CEO, Dar Express Logistics', clientAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80', content: 'The delivery app they designed transformed our operations. Live tracking and M-Pesa payments made a huge difference.', rating: 5, isApproved: true, isFeatured: true, sortOrder: 2, serviceId: serviceIdBySlug['ai-automation'] },
+      { clientName: 'Amina Said', clientCompany: 'Marketing Lead, Mama Zawadi Fashion', clientAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80', content: 'Our brand finally looks as good as our products. Social media engagement tripled after the rebrand.', rating: 5, isApproved: true, isFeatured: true, sortOrder: 3, serviceId: serviceIdBySlug['brand-identity'] },
+      { clientName: 'Baraka John', clientCompany: 'Director, Kilimanjaro Coffee Exports', clientAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80', content: 'The company profile they created helped us open doors at international trade fairs. Truly world-class work.', rating: 5, isApproved: true, isFeatured: false, sortOrder: 4, serviceId: serviceIdBySlug['creative-studio'] },
+      { clientName: 'Zawadi Mushi', clientCompany: 'Owner, Mbeya Health Clinic', clientAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80', content: 'Our digital marketing campaigns bring in new patients every week. The team is knowledgeable and responsive.', rating: 4, isApproved: true, isFeatured: false, sortOrder: 5, serviceId: serviceIdBySlug['digital-marketing'] },
+      { clientName: 'Emmanuel Kipara', clientCompany: 'CTO, Serengeti Tours Co.', clientAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80', content: 'From planning to launch, CadorDigital delivered a booking platform that just works. Highly recommended.', rating: 5, isApproved: true, isFeatured: false, sortOrder: 6, serviceId: serviceIdBySlug['website-development'] },
+    ];
+    for (const t of testimonials) {
+      await prisma.testimonial.create({ data: t });
+    }
+    console.log('Testimonials seeded.');
+  }
+
   const portfolios = [
     {
       slug: 'safari-adventures-company-profile',

@@ -122,8 +122,12 @@ export const homepageController = {
           pricingQuery(),
           academyQuery(),
         ]);
-        const testimonials = await prisma.testimonial.count({ where: { isApproved: true } });
-        return { services, portfolio, blog, pricing, academy, testimonials };
+        const testimonials = await prisma.testimonial.findMany({
+          where: { isApproved: true },
+          include: { service: { select: { name: true, slug: true, featuredImage: true } } },
+          orderBy: { sortOrder: 'asc' },
+        });
+        return { services, portfolio, blog, pricing, academy, testimonials, testimonialCount: testimonials.length };
       });
       return sendBundle(res, data);
     } catch (error) {
