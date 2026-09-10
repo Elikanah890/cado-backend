@@ -132,11 +132,11 @@ export const blogTagSchema = z.object({
 
 export const testimonialSchema = z.object({
   clientName: z.string().min(1),
-  clientCompany: z.string().optional(),
-  clientAvatar: z.string().optional(),
+  clientCompany: z.string().optional().nullable(),
+  clientAvatar: z.string().optional().nullable(),
   content: z.string().min(10),
   rating: z.number().min(1).max(5).optional(),
-  serviceId: z.string().optional(),
+  serviceId: z.string().optional().nullable(),
   isFeatured: z.boolean().optional(),
   isApproved: z.boolean().optional(),
   sortOrder: z.number().optional(),
