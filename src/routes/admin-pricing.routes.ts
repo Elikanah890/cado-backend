@@ -3,6 +3,7 @@ import {
   adminPricingPlanController,
   adminHostingPlanController,
   adminCustomServiceController,
+  adminPricingCategoryController,
 } from '../controllers/pricing.controller';
 import { authenticate } from '../middleware/auth';
 import { adminLimiter } from '../middleware/rateLimiter';
@@ -12,6 +13,7 @@ import {
   pricingPlanSchema,
   hostingPlanSchema,
   customServiceSchema,
+  pricingCategorySchema,
 } from '../validations/pricing.validation';
 import { invalidateHomepageCacheOnWrite } from '../middleware/invalidateHomepageCache';
 
@@ -20,6 +22,12 @@ const router = Router();
 router.use(authenticate);
 router.use(adminLimiter);
 router.use(invalidateHomepageCacheOnWrite);
+
+// Pricing Categories
+router.get('/categories', adminPricingCategoryController.getAll);
+router.post('/categories', validate(pricingCategorySchema), activityLogger('Create Pricing Category', 'pricing'), adminPricingCategoryController.create);
+router.put('/categories/:id', validate(pricingCategorySchema), activityLogger('Update Pricing Category', 'pricing'), adminPricingCategoryController.update);
+router.delete('/categories/:id', activityLogger('Delete Pricing Category', 'pricing'), adminPricingCategoryController.delete);
 
 // Pricing Plans (Startup Bundles)
 router.get('/plans', adminPricingPlanController.getAll);

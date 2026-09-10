@@ -1,5 +1,14 @@
 import { z } from 'zod';
 
+export const pricingCategorySchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  slug: z.string().min(1, 'Slug is required'),
+  description: z.string().optional().nullable(),
+  icon: z.string().optional().nullable(),
+  sortOrder: z.number().optional().default(0),
+  isActive: z.boolean().optional().default(true),
+});
+
 export const pricingPlanSchema = z.object({
   slug: z.string().min(1, 'Slug is required'),
   name: z.string().min(1, 'Name is required'),
@@ -10,6 +19,8 @@ export const pricingPlanSchema = z.object({
   isPopular: z.boolean().optional().default(false),
   isActive: z.boolean().optional().default(true),
   sortOrder: z.number().optional().default(0),
+  categoryId: z.string().optional().nullable(),
+  period: z.enum(['one-time', 'year', 'month']).optional().default('one-time'),
 });
 
 export const hostingPlanSchema = z.object({

@@ -267,7 +267,19 @@ async function seed() {
   }
   console.log('Blog content seeded.');
 
-  // Pricing Plans (Startup Bundles)
+  // Pricing Categories
+  const startupBundles = await prisma.pricingCategory.upsert({
+    where: { slug: 'startup-bundles' },
+    update: { name: 'Startup Bundles', description: 'All-in-one packages for launching and growing your business.', icon: 'rocket', sortOrder: 1, isActive: true },
+    create: { slug: 'startup-bundles', name: 'Startup Bundles', description: 'All-in-one packages for launching and growing your business.', icon: 'rocket', sortOrder: 1, isActive: true },
+  });
+  const marketingPlans = await prisma.pricingCategory.upsert({
+    where: { slug: 'marketing-plans' },
+    update: { name: 'Marketing Plans', description: 'Ongoing digital marketing retainers billed monthly.', icon: 'megaphone', sortOrder: 2, isActive: true },
+    create: { slug: 'marketing-plans', name: 'Marketing Plans', description: 'Ongoing digital marketing retainers billed monthly.', icon: 'megaphone', sortOrder: 2, isActive: true },
+  });
+
+  // Pricing Plans
   const pricingPlans = [
     {
       slug: 'launch',
@@ -279,6 +291,8 @@ async function seed() {
       isPopular: false,
       isActive: true,
       sortOrder: 1,
+      categoryId: startupBundles.id,
+      period: 'one-time',
     },
     {
       slug: 'grow',
@@ -290,6 +304,8 @@ async function seed() {
       isPopular: true,
       isActive: true,
       sortOrder: 2,
+      categoryId: startupBundles.id,
+      period: 'one-time',
     },
     {
       slug: 'dominate',
@@ -301,12 +317,40 @@ async function seed() {
       isPopular: false,
       isActive: true,
       sortOrder: 3,
+      categoryId: startupBundles.id,
+      period: 'one-time',
+    },
+    {
+      slug: 'social-media-growth',
+      name: 'Social Media Growth',
+      tagline: 'Monthly social media management',
+      price: 450000,
+      currency: 'TZS',
+      features: ['Content Calendar', '12 Posts / Month', 'Community Management', 'Monthly Report'],
+      isPopular: false,
+      isActive: true,
+      sortOrder: 1,
+      categoryId: marketingPlans.id,
+      period: 'month',
+    },
+    {
+      slug: 'full-marketing-suite',
+      name: 'Full Marketing Suite',
+      tagline: 'A complete outsourced marketing team',
+      price: 1500000,
+      currency: 'TZS',
+      features: ['Social Media', 'SEO', 'Email Marketing', 'Paid Ads', 'Content Marketing'],
+      isPopular: true,
+      isActive: true,
+      sortOrder: 2,
+      categoryId: marketingPlans.id,
+      period: 'month',
     },
   ];
   for (const plan of pricingPlans) {
-    await prisma.pricingPlan.upsert({ where: { slug: plan.slug }, update: {}, create: plan });
+    await prisma.pricingPlan.upsert({ where: { slug: plan.slug }, update: plan, create: plan });
   }
-  console.log('Pricing plans seeded.');
+  console.log('Pricing categories and plans seeded.');
 
   // Hosting Plans
   const hostingPlans = [
