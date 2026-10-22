@@ -5,11 +5,13 @@ import { adminLimiter } from '../middleware/rateLimiter';
 import { activityLogger } from '../middleware/activityLogger';
 import { validate } from '../middleware/validate';
 import { productSchema } from '../utils/validators';
+import { invalidateHomepageCacheOnWrite } from '../middleware/invalidateHomepageCache';
 
 const router = Router();
 
 router.use(authenticate);
 router.use(adminLimiter);
+router.use(invalidateHomepageCacheOnWrite);
 
 router.get('/', adminProductController.getAll);
 router.get('/:id', adminProductController.getById);
