@@ -45,23 +45,9 @@ model Service {
   sortOrder     Int?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
-  packages      ServicePackage[]
   testimonials  Testimonial[]
 }
 
-model ServicePackage {
-  id            String   @id @default(cuid())
-  serviceId     String
-  name          String
-  price         Float
-  currency      String   @default("TZS")
-  features      Json?
-  isHighlighted Boolean  @default(false)
-  sortOrder     Int?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  service       Service  @relation(fields: [serviceId], references: [id])
-}
 
 enum PortfolioStatus {
   COMPLETED
@@ -258,36 +244,7 @@ model Testimonial {
   service       Service? @relation(fields: [serviceId], references: [id])
 }
 
-model PricingCategory {
-  id          String        @id @default(cuid())
-  name        String
-  slug        String        @unique
-  description String?
-  icon        String?
-  sortOrder   Int           @default(0)
-  isActive    Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  plans       PricingPlan[]
-}
 
-model PricingPlan {
-  id          String          @id @default(cuid())
-  categoryId  String
-  category    PricingCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  name        String
-  slug        String          @unique
-  price       Float
-  currency    String          @default("TZS")
-  period      String?
-  description String?
-  features    String[]
-  isPopular   Boolean         @default(false)
-  sortOrder   Int             @default(0)
-  isActive    Boolean         @default(true)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-}
 
 model Setting {
   id        String   @id @default(cuid())
@@ -324,4 +281,35 @@ model Visitor {
   @@index([path])
   @@index([deviceType])
   @@index([visitorId])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  price       Float
+  currency    String   @default("TZS")
+  images      Json
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HeroSetting {
+  id                  String   @id @default("main_hero")
+  tagline             String   @default("Build. Market. Automate. Grow.")
+  heading             String   @default("We Build Brands & Smart Systems That Drive Real Growth.")
+  subtext             String   @default("Tailored digital solutions for ambitious businesses in Tanzania and beyond.")
+  primaryButtonText   String   @default("Chat on WhatsApp")
+  primaryButtonUrl    String   @default("https://wa.me/255716168903")
+  secondaryButtonText String   @default("View Portfolio")
+  secondaryButtonUrl  String   @default("/portfolio")
+  stat1Value          String   @default("6+")
+  stat1Label          String   @default("Happy Clients")
+  stat2Value          String   @default("10+")
+  stat2Label          String   @default("Projects Delivered")
+  heroImages          Json
+  updatedAt           DateTime @updatedAt
 }

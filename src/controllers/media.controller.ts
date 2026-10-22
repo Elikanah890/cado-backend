@@ -17,7 +17,7 @@ const ALLOWED_MIME_TYPES = [
   'video/mpeg',
 ];
 
-const ALLOWED_FOLDERS = ['general', 'services', 'portfolio', 'blog', 'courses', 'course', 'team', 'settings'];
+const ALLOWED_FOLDERS = ['general', 'services', 'portfolio', 'blog', 'courses', 'course', 'shop', 'products', 'hero', 'team', 'settings'];
 
 function sanitizeFolder(folder: string): string {
   const normalized = path.normalize(folder).replace(/^(\.\.(\/|\\|$))+/, '');

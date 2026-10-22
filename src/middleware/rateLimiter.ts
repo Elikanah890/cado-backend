@@ -18,7 +18,7 @@ const limiterOptions = {
 
 export const publicLimiter = rateLimit({
   windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  max: Number(process.env.PUBLIC_RATE_LIMIT_MAX) || 1000,
   ...(redis ? { store: redisStore('public') } : {}),
   ...limiterOptions,
   message: { status: 'error', code: 429, message: 'Too many requests, please try again later.' },
@@ -26,7 +26,7 @@ export const publicLimiter = rateLimit({
 
 export const adminLimiter = rateLimit({
   windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: process.env.NODE_ENV === 'production' ? 50 : 200,
+  max: Number(process.env.ADMIN_RATE_LIMIT_MAX) || (process.env.NODE_ENV === 'production' ? 1000 : 2000),
   ...(redis ? { store: redisStore('admin') } : {}),
   ...limiterOptions,
   message: { status: 'error', code: 429, message: 'Too many requests, please try again later.' },

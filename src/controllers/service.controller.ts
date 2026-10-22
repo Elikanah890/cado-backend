@@ -7,7 +7,6 @@ export const serviceController = {
     try {
       const services = await prisma.service.findMany({
         where: { isActive: true },
-        include: { packages: { orderBy: { sortOrder: 'asc' } } },
         orderBy: { sortOrder: 'asc' },
       });
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -22,7 +21,6 @@ export const serviceController = {
     try {
       const service = await prisma.service.findUnique({
         where: { slug: req.params.slug, isActive: true },
-        include: { packages: { orderBy: { sortOrder: 'asc' } } },
       });
       if (!service) {
         return res.status(404).json({ status: 'error', code: 404, message: 'Service not found' });
@@ -38,7 +36,6 @@ export const adminServiceController = {
   async getAll(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const services = await prisma.service.findMany({
-        include: { packages: { orderBy: { sortOrder: 'asc' } } },
         orderBy: { sortOrder: 'asc' },
       });
       return res.json({ status: 'success', code: 200, data: services });
@@ -85,35 +82,4 @@ export const adminServiceController = {
     }
   },
 
-  async createPackage(req: AuthRequest, res: Response, next: NextFunction) {
-    try {
-      const pkg = await prisma.servicePackage.create({
-        data: { ...req.body, serviceId: req.params.id },
-      });
-      return res.status(201).json({ status: 'success', code: 201, data: pkg });
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  async updatePackage(req: AuthRequest, res: Response, next: NextFunction) {
-    try {
-      const pkg = await prisma.servicePackage.update({
-        where: { id: req.params.packageId },
-        data: req.body,
-      });
-      return res.json({ status: 'success', code: 200, data: pkg });
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  async deletePackage(req: AuthRequest, res: Response, next: NextFunction) {
-    try {
-      await prisma.servicePackage.delete({ where: { id: req.params.packageId } });
-      return res.json({ status: 'success', code: 200, message: 'Package deleted' });
-    } catch (error) {
-      next(error);
-    }
-  },
 };

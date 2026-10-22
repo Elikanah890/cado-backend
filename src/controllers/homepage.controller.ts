@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/database';
 import { redis } from '../config/redis';
+import { getHeroSetting } from './hero.controller';
 
 const CACHE_TTL_SECONDS = 60;
 const CACHE_KEYS = [
@@ -9,7 +10,6 @@ const CACHE_KEYS = [
   'bundle:portfolio-page',
   'bundle:blog-page',
   'bundle:academy-page',
-  'bundle:pricing-page',
 ];
 
 async function getCached<T>(key: string, loader: () => Promise<T>): Promise<T> {
@@ -52,7 +52,6 @@ function sendBundle(res: Response, data: unknown) {
 
 const serviceQuery = () => prisma.service.findMany({
   where: { isActive: true },
-  include: { packages: { orderBy: { sortOrder: 'asc' } } },
   orderBy: { sortOrder: 'asc' },
 });
 
@@ -71,15 +70,14 @@ const blogPostsQuery = () => prisma.blogPost.findMany({
   take: 12,
 });
 
-const pricingQuery = () => prisma.pricingCategory.findMany({
-  where: { isActive: true },
-  include: { plans: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } } },
-  orderBy: { sortOrder: 'asc' },
-}).then((categories) => ({ categories }));
-
 const academyQuery = () => prisma.course.findMany({
   where: { isActive: true },
   include: { _count: { select: { modules: true } } },
+  orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+});
+
+const productQuery = () => prisma.product.findMany({
+  where: { isActive: true },
   orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
 });
 
@@ -115,19 +113,20 @@ export const homepageController = {
   async getHomepage(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getCached('bundle:homepage', async () => {
-        const [services, portfolio, blog, pricing, academy] = await Promise.all([
+        const [services, portfolio, blog, academy, hero, products] = await Promise.all([
           serviceQuery(),
           portfolioQuery(),
           blogPostsQuery(),
-          pricingQuery(),
           academyQuery(),
+          getHeroSetting(),
+          productQuery(),
         ]);
         const testimonials = await prisma.testimonial.findMany({
           where: { isApproved: true },
           include: { service: { select: { name: true, slug: true, featuredImage: true } } },
           orderBy: { sortOrder: 'asc' },
         });
-        return { services, portfolio, blog, pricing, academy, testimonials, testimonialCount: testimonials.length };
+        return { services, portfolio, blog, academy, hero, products, testimonials, testimonialCount: testimonials.length };
       });
       return sendBundle(res, data);
     } catch (error) {
@@ -235,12 +234,4 @@ export const homepageController = {
     }
   },
 
-  async getPricingPage(_req: Request, res: Response, next: NextFunction) {
-    try {
-      const data = await getCached('bundle:pricing-page', pricingQuery);
-      return sendBundle(res, data);
-    } catch (error) {
-      next(error);
-    }
-  },
 };

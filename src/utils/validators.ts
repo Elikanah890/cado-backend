@@ -178,14 +178,6 @@ export const adminPasswordSchema = z.object({
   path: ['confirmPassword'],
 });
 
-export const servicePackageSchema = z.object({
-  name: z.string().min(1),
-  price: z.number().positive(),
-  currency: z.string().default('TZS'),
-  features: z.any().optional(),
-  isHighlighted: z.boolean().optional(),
-  sortOrder: z.number().optional(),
-});
 
 export const courseLessonSchema = z.object({
   title: z.string().min(1),
@@ -197,4 +189,36 @@ export const courseLessonSchema = z.object({
   moduleId: z.string().optional().nullable(),
   sortOrder: z.union([z.number(), z.string().transform((v) => Number(v)), z.null(), z.undefined()]).optional(),
   isFree: z.union([z.boolean(), z.string().transform((v) => v === 'true'), z.null(), z.undefined()]).optional(),
+});
+
+export const productSchema = z.object({
+  title: z.string().min(1),
+  slug: z.string().min(1),
+  description: z.string().default(''),
+  price: z.union([
+    z.number().min(0),
+    z.string().transform((v) => (v.trim() === '' ? 0 : Number(v))),
+  ]),
+  currency: z.string().optional().default('TZS'),
+  images: z.array(z.object({
+    url: z.string().min(1),
+    alt: z.string().optional().nullable(),
+  })).optional().default([]),
+  isActive: z.boolean().optional(),
+  sortOrder: z.number().optional(),
+});
+
+export const heroSettingSchema = z.object({
+  tagline: z.string().optional(),
+  heading: z.string().optional(),
+  subtext: z.string().optional(),
+  primaryButtonText: z.string().optional(),
+  primaryButtonUrl: z.string().optional(),
+  secondaryButtonText: z.string().optional(),
+  secondaryButtonUrl: z.string().optional(),
+  stat1Value: z.string().optional(),
+  stat1Label: z.string().optional(),
+  stat2Value: z.string().optional(),
+  stat2Label: z.string().optional(),
+  heroImages: z.array(z.string()).optional(),
 });
