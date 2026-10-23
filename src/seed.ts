@@ -289,11 +289,19 @@ async function seed() {
   console.log('Blog content seeded.');
 
 
-  await prisma.setting.upsert({
-    where: { key: 'company_name' },
-    update: {},
-    create: { key: 'company_name', value: 'CadorDigital' },
-  });
+  const settings = [
+    { key: 'company_name', value: 'CadorDigital', group: 'company' },
+    { key: 'social_instagram', value: 'https://www.instagram.com/cadorgraphix/', group: 'social' },
+    { key: 'social_youtube', value: 'https://www.youtube.com/@cadorgraphix', group: 'social' },
+    { key: 'social_facebook', value: 'https://www.facebook.com/cadorgraphix', group: 'social' },
+  ];
+  for (const setting of settings) {
+    await prisma.setting.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: setting,
+    });
+  }
   console.log('Settings seeded.');
 
   console.log('Seed complete!');
