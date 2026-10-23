@@ -199,6 +199,11 @@ export const productSchema = z.object({
     z.number().min(0),
     z.string().transform((v) => (v.trim() === '' ? 0 : Number(v))),
   ]),
+  originalPrice: z.union([
+    z.number().min(0),
+    z.string(),
+    z.null(),
+  ]).optional(),
   currency: z.string().optional().default('TZS'),
   images: z.array(z.object({
     url: z.string().min(1),

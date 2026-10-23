@@ -6,6 +6,12 @@ function coerceProduct(body: any) {
   const data: any = { ...body };
 
   data.price = Number(data.price) || 0;
+  if (data.originalPrice === undefined || data.originalPrice === null || data.originalPrice === '') {
+    data.originalPrice = null;
+  } else {
+    const originalPrice = Number(data.originalPrice);
+    data.originalPrice = Number.isFinite(originalPrice) && originalPrice > 0 ? originalPrice : null;
+  }
   data.sortOrder = Number(data.sortOrder) || 0;
   data.isActive = data.isActive === true || data.isActive === 'true'
     ? true
