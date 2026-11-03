@@ -14,6 +14,7 @@ export const contactSchema = z.object({
   serviceNeeded: z.string().optional(),
   budgetRange: z.string().optional(),
   message: z.string().min(10, 'Message must be at least 10 characters'),
+  source: z.string().max(50).optional(),
 });
 
 export const newsletterSchema = z.object({

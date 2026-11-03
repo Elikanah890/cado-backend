@@ -3,10 +3,23 @@ import { prisma } from '../config/database';
 import { AuthRequest } from '../middleware/auth';
 import { sendEmail, emailTemplates } from '../services/email.service';
 
+const ALLOWED_SOURCES = new Set([
+  'website',
+  'newsletter',
+  'course-registration',
+  'product-registration',
+  'service-registration',
+  'registration',
+]);
+
 export const leadController = {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const lead = await prisma.lead.create({ data: { ...req.body, source: 'website' } });
+      const source =
+        typeof req.body.source === 'string' && ALLOWED_SOURCES.has(req.body.source)
+          ? req.body.source
+          : 'website';
+      const lead = await prisma.lead.create({ data: { ...req.body, source } });
 
       await sendEmail({
         to: process.env.ADMIN_EMAIL || 'admin@cador.digital',
