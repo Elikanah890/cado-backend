@@ -155,6 +155,45 @@ export const leadSchema = z.object({
   source: z.string().optional(),
 });
 
+const registrationCategories = ['COURSE', 'PRODUCT', 'SERVICE'] as const;
+const registrationStatuses = ['PENDING', 'CONTACTED', 'PAID', 'COMPLETED', 'CANCELLED'] as const;
+
+const registrationPhoneSchema = z
+  .string()
+  .min(9, 'Phone number is required')
+  .max(20)
+  .refine(
+    (value) => /^(?:\+?255|0)\d{9}$/.test(value.replace(/[\s()-]/g, '')),
+    'Use a valid Tanzania phone number (e.g. +255 7XX XXX XXX)'
+  );
+
+export const registrationSchema = z.object({
+  fullName: z.string().min(2, 'Full name is required').max(120),
+  email: z.string().email('Invalid email address'),
+  phone: registrationPhoneSchema,
+  location: z.string().max(200).optional().nullable(),
+  category: z.enum(registrationCategories),
+  itemName: z.string().min(1, 'Item name is required').max(200),
+  itemSlug: z.string().max(200).optional().nullable(),
+  details: z.record(z.string(), z.any()).optional().nullable(),
+  message: z.string().max(3000).optional().nullable(),
+  preferredContact: z.enum(['whatsapp', 'phone', 'email']).optional().default('whatsapp'),
+  consent: z.boolean().refine((value) => value === true, 'Consent is required'),
+});
+
+export const adminManualRegistrationSchema = registrationSchema.extend({
+  email: z.union([z.string().email(), z.literal(''), z.null()]).optional(),
+  consent: z.boolean().optional().default(true),
+  status: z.enum(registrationStatuses).optional(),
+  internalNotes: z.string().max(4000).optional().nullable(),
+  source: z.string().max(30).optional(),
+});
+
+export const adminRegistrationUpdateSchema = z.object({
+  status: z.enum(registrationStatuses).optional(),
+  internalNotes: z.string().max(4000).optional().nullable(),
+});
+
 export const settingsSchema = z.object({
   settings: z.record(z.string(), z.string().nullable()),
 });

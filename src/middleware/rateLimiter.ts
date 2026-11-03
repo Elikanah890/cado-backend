@@ -49,3 +49,11 @@ export const contactLimiter = rateLimit({
   message: { status: 'error', code: 429, message: 'Too many contact submissions, please try again later.' },
 });
 
+export const registrationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: Number(process.env.REGISTRATION_RATE_LIMIT_MAX) || 15,
+  ...(redis ? { store: redisStore('registration') } : {}),
+  ...limiterOptions,
+  message: { status: 'error', code: 429, message: 'Too many registration submissions, please try again later.' },
+});
+

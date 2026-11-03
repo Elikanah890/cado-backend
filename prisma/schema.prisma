@@ -228,6 +228,32 @@ model Lead {
   updatedAt     DateTime @updatedAt
 }
 
+model Registration {
+  id               String   @id @default(cuid())
+  ref              String   @unique
+  fullName         String
+  email            String?
+  phone            String
+  location         String?
+  category         String
+  itemName         String
+  itemSlug         String?
+  details          Json?
+  message          String?
+  preferredContact String   @default("whatsapp")
+  consent          Boolean  @default(true)
+  status           String   @default("PENDING")
+  internalNotes    String?
+  source           String   @default("WEBSITE")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@index([phone])
+}
+
 model Testimonial {
   id            String   @id @default(cuid())
   clientName    String
