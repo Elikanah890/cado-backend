@@ -19,6 +19,10 @@ const ALLOWED_MIME_TYPES = [
 
 const ALLOWED_FOLDERS = ['general', 'services', 'portfolio', 'blog', 'courses', 'course', 'shop', 'products', 'hero', 'team', 'settings'];
 
+const MAX_VIDEO_SIZE_MB = Number(process.env.MAX_VIDEO_SIZE_MB) || 100;
+const MAX_VIDEO_SIZE = MAX_VIDEO_SIZE_MB * 1024 * 1024;
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+
 function sanitizeFolder(folder: string): string {
   const normalized = path.normalize(folder).replace(/^(\.\.(\/|\\|$))+/, '');
   const basename = path.basename(normalized);
@@ -74,6 +78,22 @@ export const mediaController = {
           status: 'error', 
           code: 400, 
           message: `File type ${file.mimetype} is not allowed. Allowed types: ${ALLOWED_MIME_TYPES.join(', ')}` 
+        });
+      }
+
+      if (file.mimetype.startsWith('video/') && file.size > MAX_VIDEO_SIZE) {
+        return res.status(413).json({
+          status: 'error',
+          code: 413,
+          message: `Video is too large. Maximum size is ${MAX_VIDEO_SIZE_MB}MB.`,
+        });
+      }
+
+      if (!file.mimetype.startsWith('video/') && file.size > MAX_IMAGE_SIZE) {
+        return res.status(413).json({
+          status: 'error',
+          code: 413,
+          message: 'Images and PDFs must be 20MB or smaller.',
         });
       }
 

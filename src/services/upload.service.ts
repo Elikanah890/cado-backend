@@ -1,7 +1,9 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
+import { v2 as cloudinary } from 'cloudinary';
 import logger from '../utils/logger';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
@@ -13,6 +15,29 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 const isPlaceholder = (value: string | undefined): boolean =>
   !value || value === 'your_cloudinary_name' || value === 'your_cloudinary_api_key' || value === 'your_cloudinary_api_secret';
 
+const CLOUDINARY_TIMEOUT_MS = 120_000;
+const VIDEO_CHUNK_SIZE = 6_000_000;
+const MAX_VIDEO_SIZE_MB = Number(process.env.MAX_VIDEO_SIZE_MB) || 100;
+
+function logCloudinaryError(error: any, kind: 'video' | 'image'): void {
+  const status = error?.http_code || error?.statusCode || error?.response?.status;
+  const message =
+    error?.response?.data?.error?.message ||
+    error?.error?.message ||
+    error?.message ||
+    'Unknown Cloudinary error';
+
+  if (status === 413 || /too large|file size|maximum/i.test(message)) {
+    logger.error(`[upload] ${kind} exceeds the Cloudinary size limit (${MAX_VIDEO_SIZE_MB}MB): ${message}`);
+    return;
+  }
+  if (/timeout|timed out|ETIMEDOUT|ECONNABORTED|socket hang up|network/i.test(message)) {
+    logger.error(`[upload] ${kind} upload timed out or the network failed: ${message}`);
+    return;
+  }
+  logger.error(`[upload] ${kind} upload failed${status ? ` (status ${status})` : ''}: ${message}`);
+}
+
 export const uploadToLocal = async (file: Express.Multer.File, folder: string = 'general'): Promise<string> => {
   const folderPath = path.join(UPLOAD_DIR, folder);
   if (!fs.existsSync(folderPath)) {
@@ -23,7 +48,7 @@ export const uploadToLocal = async (file: Express.Multer.File, folder: string = 
   const fileName = `${uuidv4()}${ext}`;
   const filePath = path.join(folderPath, fileName);
 
-  fs.writeFileSync(filePath, file.buffer);
+  await fs.promises.writeFile(filePath, file.buffer);
 
   return `/uploads/${folder}/${fileName}`;
 };
@@ -44,15 +69,62 @@ export const uploadToCloudinary = async (file: Express.Multer.File, folder: stri
   }
 
   const isVideo = file.mimetype.startsWith('video/');
-  const resourceType = isVideo ? 'video' : 'image';
+  const publicId = `cador_${uuidv4()}`;
 
+  // Large videos: use Cloudinary's chunked/resumable upload API instead of a
+  // single multipart POST. This is what allows files above ~100MB to finish
+  // reliably and gives the SDK room to retry individual chunks.
+  if (isVideo) {
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+      secure: true,
+    });
+
+    const extension = path.extname(file.originalname) || '.mp4';
+    const tempPath = path.join(os.tmpdir(), `cador-${uuidv4()}${extension}`);
+
+    try {
+      await fs.promises.writeFile(tempPath, file.buffer);
+
+      const result = await new Promise<any>((resolve, reject) => {
+        cloudinary.uploader.upload_large(
+          tempPath,
+          {
+            resource_type: 'video',
+            folder,
+            public_id: publicId,
+            timeout: CLOUDINARY_TIMEOUT_MS,
+            chunk_size: VIDEO_CHUNK_SIZE,
+          },
+          (error: any, uploadResult: any) => {
+            if (error) reject(error);
+            else resolve(uploadResult);
+          }
+        );
+      });
+
+      if (!result?.secure_url) {
+        throw new Error('Cloudinary response did not include a secure_url');
+      }
+
+      return result.secure_url;
+    } catch (error: any) {
+      logCloudinaryError(error, 'video');
+      // Best-effort fallback so the admin still gets a saved file.
+      return uploadToLocal(file, folder);
+    } finally {
+      await fs.promises.unlink(tempPath).catch(() => {});
+    }
+  }
+
+  // Images and PDFs continue through the existing signed multipart upload.
+  const resourceType = 'image';
   const FormData = (await import('form-data')).default;
   const axios = (await import('axios')).default;
-
-  const publicId = `cador_${uuidv4()}`;
   const timestamp = Math.floor(Date.now() / 1000);
 
-  // Signed upload — no upload preset required, works with any Cloudinary account.
   const paramsToSign: Record<string, string> = {
     folder,
     public_id: publicId,
@@ -80,7 +152,7 @@ export const uploadToCloudinary = async (file: Express.Multer.File, folder: stri
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
       formData,
-      { headers: { ...formData.getHeaders() }, timeout: 60000 }
+      { headers: { ...formData.getHeaders() }, timeout: CLOUDINARY_TIMEOUT_MS }
     );
 
     if (!response.data?.secure_url) {
@@ -89,10 +161,7 @@ export const uploadToCloudinary = async (file: Express.Multer.File, folder: stri
 
     return response.data.secure_url;
   } catch (error: any) {
-    const message = error?.response?.data?.error?.message || error?.message || 'Cloudinary upload failed';
-    logger.error(`[upload] Cloudinary upload failed: ${message}`);
-    // Fall back to local storage so uploads still succeed (best-effort) while
-    // the misconfiguration is being resolved on the hosting platform.
+    logCloudinaryError(error, 'image');
     return uploadToLocal(file, folder);
   }
 };

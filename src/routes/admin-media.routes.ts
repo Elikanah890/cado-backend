@@ -5,10 +5,12 @@ import { adminLimiter } from '../middleware/rateLimiter';
 import { activityLogger } from '../middleware/activityLogger';
 import multer from 'multer';
 
+const MAX_UPLOAD_SIZE_MB = Number(process.env.MAX_VIDEO_SIZE_MB) || 100;
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 20 * 1024 * 1024, // 20 MB
+    fileSize: MAX_UPLOAD_SIZE_MB * 1024 * 1024,
     files: 1,
   },
   fileFilter: (_req, file, cb) => {
@@ -44,6 +46,13 @@ router.post(
     upload.single('file')(req, res, (err: any) => {
       if (err) {
         if (err instanceof multer.MulterError) {
+          if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(413).json({
+              status: 'error',
+              code: 413,
+              message: `File is too large. Maximum size is ${MAX_UPLOAD_SIZE_MB}MB.`,
+            });
+          }
           return res.status(400).json({ status: 'error', code: 400, message: `Upload error: ${err.message}` });
         }
         return res.status(400).json({ status: 'error', code: 400, message: err.message || 'File upload failed' });
