@@ -14,6 +14,12 @@ function coerceCourseScalars(data: any) {
   if (typeof data.description === 'string') data.description = sanitizeHtmlContent(data.description);
   if (data.price !== undefined && data.price !== '' && data.price !== null) data.price = Number(data.price);
   else if (data.price === '' || data.price === null) data.price = null;
+  if (data.originalPrice !== undefined && data.originalPrice !== '' && data.originalPrice !== null) {
+    const originalPrice = Number(data.originalPrice);
+    data.originalPrice = Number.isFinite(originalPrice) && originalPrice > 0 ? originalPrice : null;
+  } else if (data.originalPrice === '' || data.originalPrice === null) {
+    data.originalPrice = null;
+  }
   if (data.estimatedHours !== undefined && data.estimatedHours !== '' && data.estimatedHours !== null) data.estimatedHours = Number(data.estimatedHours);
   else if (data.estimatedHours === '' || data.estimatedHours === null) data.estimatedHours = null;
   if (data.sortOrder !== undefined && data.sortOrder !== '') data.sortOrder = Number(data.sortOrder) || 0;

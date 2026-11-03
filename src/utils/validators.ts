@@ -81,6 +81,12 @@ export const courseSchema = z.object({
     z.null(),
     z.undefined(),
   ]).optional(),
+  originalPrice: z.union([
+    z.number().min(0),
+    z.string().transform((v) => (v === '' || v.trim() === '' ? null : Number(v))),
+    z.null(),
+    z.undefined(),
+  ]).optional(),
   currency: z.string().optional().default('TZS'),
   level: z.string().optional().nullable(),
   category: z.string().optional().nullable(),

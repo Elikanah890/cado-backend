@@ -102,6 +102,7 @@ model Course {
   introVideo       String?
   whatsappNumber   String?
   price            Float?
+  originalPrice    Float?
   currency         String         @default("TZS")
   level            String?
   category         String?
