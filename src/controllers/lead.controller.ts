@@ -22,7 +22,7 @@ export const leadController = {
       const lead = await prisma.lead.create({ data: { ...req.body, source } });
 
       await sendEmail({
-        to: process.env.ADMIN_EMAIL || 'admin@cador.digital',
+        to: process.env.ADMIN_EMAIL || 'cadordigital@gmail.com',
         subject: `New Lead: ${lead.firstName} ${lead.lastName}`,
         html: emailTemplates.contactReceived({
           name: `${lead.firstName} ${lead.lastName}`,

@@ -3,7 +3,7 @@ import { config } from '../config';
 
 const defaultSettings: Record<string, string> = {
   company_name: 'CadorDigital',
-  company_email: 'admin@cador.digital',
+  company_email: 'cadordigital@gmail.com',
   company_phone: '+255 716 168 903',
   company_address: 'Mbeya, Tanzania',
   company_logo: '',
